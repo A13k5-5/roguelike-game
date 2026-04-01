@@ -8,8 +8,23 @@ const SCREEN_HEIGHT: i32 = 50;
 const MAP_WIDTH: i32 = 80;
 const MAP_HEIGHT: i32 = 50;
 
+type Map = Vec<Vec<Tile>>;
+
+struct Game {
+    map: Map
+}
+
+fn make_map() -> Map {
+    let mut map = vec![vec![Tile::empty(); MAP_HEIGHT as usize]; MAP_WIDTH as usize];
+
+    map[30][22] = Tile::wall();
+    map[50][22] = Tile::wall();
+
+    map
+}
+
 const COLOR_DARK_WALL: Color = Color { r: 0, g: 0, b: 100 };
-const COLOR_DARK_GOUND: Color = Color {
+const COLOR_DARK_GROUND: Color = Color {
     r: 50,
     g: 50,
     b: 150
@@ -45,6 +60,7 @@ struct Tcod {
 }
 
 // any game object
+#[derive(Debug)]
 struct Object {
     x: i32,
     y: i32,
@@ -70,16 +86,41 @@ impl Object {
     }
 }
 
+fn render_all(tcod: &mut Tcod, game: &Game, objects: &[Object]) {
+    // draw all objects in the list
+    for object in objects {
+        object.draw(&mut tcod.con);
+    }
+
+    // go through all the tiles and set their background colour
+    for y in 0..MAP_HEIGHT {
+        for x in 0..MAP_WIDTH {
+            let wall = game.map[x as usize][y as usize].block_sight;
+            if wall {
+                tcod.con.set_char_background(x, y, COLOR_DARK_WALL, BackgroundFlag::Set);
+            } else {
+                tcod.con.set_char_background(x, y, COLOR_DARK_GROUND, BackgroundFlag::Set);
+            }
+        }
+    }
+
+    blit(
+        &tcod.con,
+        (0, 0),
+        (MAP_WIDTH, MAP_HEIGHT),
+        &mut tcod.root,
+        (0, 0),
+        1.0,
+        1.0
+    );
+}
+
 fn handle_keys(tcod: &mut Tcod, player: &mut Object) -> bool {
     use tcod::input::*;
 
     let key = tcod.root.wait_for_keypress(true);
 
     match key {
-        Key { code: KeyCode::Up, .. } => player.move_by(0, -1),
-        Key { code: KeyCode::Down, .. } => player.move_by(0, 1),
-        Key { code: KeyCode::Left, .. } => player.move_by(-1, 0),
-        Key { code: KeyCode::Right, .. } => player.move_by(1, 0),
         Key {
             code: KeyCode::Enter,
             alt: true,
@@ -90,6 +131,13 @@ fn handle_keys(tcod: &mut Tcod, player: &mut Object) -> bool {
             tcod.root.set_fullscreen(fullscreen);
         }
         Key { code: KeyCode::Escape, .. } => return true, // exit the game
+
+        // movement controls
+        Key { code: KeyCode::Up, .. } => player.move_by(0, -1),
+        Key { code: KeyCode::Down, .. } => player.move_by(0, 1),
+        Key { code: KeyCode::Left, .. } => player.move_by(-1, 0),
+        Key { code: KeyCode::Right, .. } => player.move_by(1, 0),
+
         _ => {}
     }
 
@@ -106,7 +154,7 @@ fn main() {
         .title("Rust/libtcod tutorial")
         .init();
 
-    let con = Offscreen::new(SCREEN_WIDTH, SCREEN_HEIGHT);
+    let con = Offscreen::new(MAP_WIDTH, MAP_HEIGHT);
 
     let mut tcod = Tcod { root, con };
 
@@ -118,25 +166,16 @@ fn main() {
 
     let mut objects = [player, npc];
 
+    let game = Game {
+        map: make_map()
+    };
+
     while !tcod.root.window_closed() {
         tcod.con.clear();
 
-        for object in &objects {
-            object.draw(&mut tcod.con);
-        }
-
-        blit(
-            &tcod.con,
-            (0, 0),
-            (SCREEN_WIDTH, SCREEN_HEIGHT),
-            &mut tcod.root,
-            (0, 0),
-            1.0,
-            1.0
-        );
+        render_all(&mut tcod, &game, &objects);
 
         tcod.root.flush();
-
 
         let player = &mut objects[0];
         let exit = handle_keys(&mut tcod, player);
