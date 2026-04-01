@@ -11,16 +11,41 @@ struct Tcod {
     con: Offscreen,
 }
 
-fn handle_keys(tcod: &mut Tcod, player_x: &mut i32, player_y: &mut i32) -> bool {
+struct Object {
+    x: i32,
+    y: i32,
+    char: char,
+    color: Color
+}
+
+impl Object {
+    pub fn new(x: i32, y: i32, char: char, color: Color) -> Self {
+        Object{ x, y, char, color }
+    }
+
+    // move by the given amount
+    pub fn move_by(&mut self, dx: i32, dy: i32) {
+        self.x += dx;
+        self.y += dy;
+    }
+
+    // set the colour and then draw the char of this object at its position
+    pub fn draw(&self, con: &mut dyn Console) {
+        con.set_default_foreground(self.color);
+        con.put_char(self.x, self.y, self.char, BackgroundFlag::None);
+    }
+}
+
+fn handle_keys(tcod: &mut Tcod, player: &mut Object) -> bool {
     use tcod::input::*;
 
     let key = tcod.root.wait_for_keypress(true);
 
     match key {
-        Key { code: KeyCode::Up, .. } => *player_y -= 1,
-        Key { code: KeyCode::Down, .. } => *player_y += 1,
-        Key { code: KeyCode::Left, .. } => *player_x -= 1,
-        Key { code: KeyCode::Right, .. } => *player_x += 1,
+        Key { code: KeyCode::Up, .. } => player.move_by(0, -1),
+        Key { code: KeyCode::Down, .. } => player.move_by(0, 1),
+        Key { code: KeyCode::Left, .. } => player.move_by(-1, 0),
+        Key { code: KeyCode::Right, .. } => player.move_by(1, 0),
         Key {
             code: KeyCode::Enter,
             alt: true,
@@ -38,6 +63,8 @@ fn handle_keys(tcod: &mut Tcod, player_x: &mut i32, player_y: &mut i32) -> bool 
 }
 
 fn main() {
+    tcod::system::set_fps(LIMIT_FPS);
+
     let root = Root::initializer()
         .font("arial10x10.png", FontLayout::Tcod)
         .font_type(FontType::Greyscale)
@@ -48,16 +75,22 @@ fn main() {
     let con = Offscreen::new(SCREEN_WIDTH, SCREEN_HEIGHT);
 
     let mut tcod = Tcod { root, con };
-    tcod::system::set_fps(LIMIT_FPS);
 
-    let mut player_x = SCREEN_WIDTH / 2;
-    let mut player_y = SCREEN_HEIGHT / 2;
+    // create object representing the player
+    let player = Object::new(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, '@', WHITE);
+
+    // create an NPC
+    let npc = Object::new(SCREEN_WIDTH / 2 -5, SCREEN_HEIGHT / 2 - 5, '@', GREEN);
+
+    let mut objects = [player, npc];
 
     while !tcod.root.window_closed() {
-        tcod.con.set_default_foreground(WHITE);
         tcod.con.clear();
-        tcod.con.put_char(player_x, player_y, '@', BackgroundFlag::None);
-        tcod.root.flush();
+
+        for object in &objects {
+            object.draw(&mut tcod.con);
+        }
+
         blit(
             &tcod.con,
             (0, 0),
@@ -68,7 +101,9 @@ fn main() {
             1.0
         );
 
-        let exit = handle_keys(&mut tcod, &mut player_x, &mut player_y);
+
+        let player = &mut objects[0];
+        let exit = handle_keys(&mut tcod, player);
         if exit {
             break;
         }
