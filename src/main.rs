@@ -74,7 +74,13 @@ impl Object {
     }
 
     // move by the given amount
-    pub fn move_by(&mut self, dx: i32, dy: i32) {
+    pub fn move_by(&mut self, dx: i32, dy: i32, game: &Game) {
+
+        // if blocked wall, not possible to get there
+        if game.map[(self.x + dx) as usize][(self.y + dy) as usize].blocked {
+            return;
+        }
+
         self.x += dx;
         self.y += dy;
     }
@@ -115,7 +121,7 @@ fn render_all(tcod: &mut Tcod, game: &Game, objects: &[Object]) {
     );
 }
 
-fn handle_keys(tcod: &mut Tcod, player: &mut Object) -> bool {
+fn handle_keys(tcod: &mut Tcod, player: &mut Object, game: &Game) -> bool {
     use tcod::input::*;
 
     let key = tcod.root.wait_for_keypress(true);
@@ -133,10 +139,10 @@ fn handle_keys(tcod: &mut Tcod, player: &mut Object) -> bool {
         Key { code: KeyCode::Escape, .. } => return true, // exit the game
 
         // movement controls
-        Key { code: KeyCode::Up, .. } => player.move_by(0, -1),
-        Key { code: KeyCode::Down, .. } => player.move_by(0, 1),
-        Key { code: KeyCode::Left, .. } => player.move_by(-1, 0),
-        Key { code: KeyCode::Right, .. } => player.move_by(1, 0),
+        Key { code: KeyCode::Up, .. } => player.move_by(0, -1, game),
+        Key { code: KeyCode::Down, .. } => player.move_by(0, 1, game),
+        Key { code: KeyCode::Left, .. } => player.move_by(-1, 0, game),
+        Key { code: KeyCode::Right, .. } => player.move_by(1, 0, game),
 
         _ => {}
     }
@@ -178,7 +184,7 @@ fn main() {
         tcod.root.flush();
 
         let player = &mut objects[0];
-        let exit = handle_keys(&mut tcod, player);
+        let exit = handle_keys(&mut tcod, player, &game);
         if exit {
             break;
         }
