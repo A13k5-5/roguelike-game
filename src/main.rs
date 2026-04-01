@@ -101,6 +101,8 @@ fn main() {
             1.0
         );
 
+        tcod.root.flush();
+
 
         let player = &mut objects[0];
         let exit = handle_keys(&mut tcod, player);
