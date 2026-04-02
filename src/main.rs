@@ -1,3 +1,4 @@
+use rand::prelude::*;
 use std::cmp;
 use tcod::colors::*;
 use tcod::console::*;
@@ -9,22 +10,70 @@ const SCREEN_HEIGHT: i32 = 50;
 const MAP_WIDTH: i32 = 80;
 const MAP_HEIGHT: i32 = 50;
 
+// parameters for dungeon generator
+const ROOM_MAX_SIZE: i32 = 10;
+const ROOM_MIN_SIZE: i32 = 6;
+const MAX_ROOMS: i32 = 30;
+
 type Map = Vec<Vec<Tile>>;
 
 struct Game {
     map: Map
 }
 
-fn make_map() -> Map {
+fn make_map(player: &mut Object) -> Map {
     // fill map with wall tiles
     let mut map = vec![vec![Tile::wall(); MAP_HEIGHT as usize]; MAP_WIDTH as usize];
 
-    // create 2 rooms
-    let room1 = Rect::new(20, 15, 10, 15);
-    let room2 = Rect::new(50, 15, 10, 15);
-    create_room(room1, &mut map);
-    create_room(room2, &mut map);
-    create_h_tunnel(25, 51, 23, &mut map);
+    let mut rooms = vec![];
+
+    for _ in 0..MAX_ROOMS {
+        // random size
+        let w = rand::rng().random_range(ROOM_MIN_SIZE..=ROOM_MAX_SIZE);
+        let h = rand::rng().random_range(ROOM_MIN_SIZE..=ROOM_MAX_SIZE);
+
+        // random position
+        let x = rand::rng().random_range(0..MAP_WIDTH - w);
+        let y = rand::rng().random_range(0..MAP_HEIGHT - h);
+
+        let new_room = Rect::new(x, y, w, h);
+
+        let failed = rooms
+            .iter()
+            .any(|other_room| new_room.intersects_with(other_room));
+
+        if failed {
+            continue
+        }
+
+        let (new_x, new_y) = new_room.centre();
+        create_room(new_room, &mut map);
+
+        match rooms.is_empty() {
+            true => {
+                // this is the first room, where the player is spawned
+                player.x = new_x;
+                player.y = new_y;
+            }
+            false => {
+                // all the other rooms
+                // connect it to the previous room with a tunnel
+
+                let (prev_x, prev_y) = rooms.last().unwrap().centre();
+
+                // horizontal and then vertical or the other way around
+                if rand::random() {
+                    create_h_tunnel(new_x, prev_x, new_y, &mut map);
+                    create_v_tunnel(new_y, prev_y, prev_x, &mut map);
+                } else {
+                    create_v_tunnel(new_y, prev_y, new_x, &mut map);
+                    create_h_tunnel(new_x, prev_x, prev_y, &mut map);
+                }
+            }
+        }
+
+        rooms.push(new_room);
+    }
 
     map
 }
@@ -75,6 +124,23 @@ impl Rect {
             x2: x + w,
             y2: y + h,
         }
+    }
+
+    pub fn centre(&self) -> (i32, i32) {
+        let centre_x = (self.x1 + self.x2) / 2;
+        let centre_y = (self.y1 + self.y2) / 2;
+        (centre_x, centre_y)
+    }
+
+    pub fn intersects_with(&self, other: &Rect) -> bool {
+        (self.x1 <= other.x2)
+            && (self.x2 >= other.x1)
+            && (self.y1 <= other.y2)
+            && (self.y2 >= other.y1)
+        // (self.x1 <= other.x2)
+        // && (self.x2 >= other.x1)
+        // && (self.y1 <= other.y2)
+        // && (self.y2 >= other.y2)
     }
 }
 
@@ -214,16 +280,16 @@ fn main() {
     let mut tcod = Tcod { root, con };
 
     // create object representing the player
-    let player = Object::new(25, 23, '@', WHITE);
+    let mut player = Object::new(0, 0, '@', WHITE);
+
+    let game = Game {
+        map: make_map(&mut player)
+    };
 
     // create an NPC
     let npc = Object::new(SCREEN_WIDTH / 2 -5, SCREEN_HEIGHT / 2 - 5, '@', GREEN);
 
     let mut objects = [player, npc];
-
-    let game = Game {
-        map: make_map()
-    };
 
     while !tcod.root.window_closed() {
         tcod.con.clear();
