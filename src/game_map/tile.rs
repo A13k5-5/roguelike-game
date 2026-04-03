@@ -18,13 +18,12 @@ impl Tile {
             block_sight: true
         }
     }
-    
+
     pub fn blocks(&self) -> bool {
         self.blocked
     }
-    
+
     pub fn blocks_sight(&self) -> bool {
         self.block_sight
     }
 }
-
