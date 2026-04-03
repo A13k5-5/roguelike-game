@@ -1,6 +1,7 @@
 use rand::RngExt;
 use crate::game_map::{Map, MAP_HEIGHT, MAP_WIDTH};
-use crate::{Object, Tile};
+use crate::{Object};
+use super::tile::Tile;
 use super::room::{create_h_tunnel, create_room, create_v_tunnel, Rect};
 
 // parameters for dungeon generator

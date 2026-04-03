@@ -1,4 +1,6 @@
 mod game_map;
+mod game_object;
+use game_object::Object;
 
 use tcod::colors::*;
 use tcod::console::*;
@@ -13,66 +15,11 @@ const COLOR_DARK_GROUND: Color = Color {
     b: 150
 };
 
-#[derive(Clone, Copy, Debug)]
-struct Tile {
-    blocked: bool,
-    block_sight: bool
-}
-
-impl Tile {
-    pub fn empty() -> Self {
-        Tile {
-            blocked: false,
-            block_sight: false
-        }
-    }
-
-    pub fn wall() -> Self {
-        Tile {
-            blocked: true,
-            block_sight: true
-        }
-    }
-}
-
 const LIMIT_FPS: i32 = 20;
 
 struct Tcod {
     root: Root,
     con: Offscreen,
-}
-
-// any game object
-#[derive(Debug)]
-struct Object {
-    x: i32,
-    y: i32,
-    char: char,
-    color: Color
-}
-
-impl Object {
-    pub fn new(x: i32, y: i32, char: char, color: Color) -> Self {
-        Object{ x, y, char, color }
-    }
-
-    // move by the given amount
-    pub fn move_by(&mut self, dx: i32, dy: i32, game: &game_map::Game) {
-
-        // if blocked wall, not possible to get there
-        if game.map[(self.x + dx) as usize][(self.y + dy) as usize].blocked {
-            return;
-        }
-
-        self.x += dx;
-        self.y += dy;
-    }
-
-    // set the colour and then draw the char of this object at its position
-    pub fn draw(&self, con: &mut dyn Console) {
-        con.set_default_foreground(self.color);
-        con.put_char(self.x, self.y, self.char, BackgroundFlag::None);
-    }
 }
 
 fn render_all(tcod: &mut Tcod, game: &game_map::Game, objects: &[Object]) {
@@ -84,8 +31,7 @@ fn render_all(tcod: &mut Tcod, game: &game_map::Game, objects: &[Object]) {
     // go through all the tiles and set their background colour
     for y in 0..game_map::MAP_HEIGHT {
         for x in 0..game_map::MAP_WIDTH {
-            let wall = game.map[x as usize][y as usize].block_sight;
-            if wall {
+            if game.map[x as usize][y as usize].blocks_sight() {
                 tcod.con.set_char_background(x, y, COLOR_DARK_WALL, BackgroundFlag::Set);
             } else {
                 tcod.con.set_char_background(x, y, COLOR_DARK_GROUND, BackgroundFlag::Set);

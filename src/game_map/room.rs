@@ -1,5 +1,6 @@
 use std::cmp;
-use crate::{game_map, Tile};
+use crate::{game_map};
+use super::tile::Tile;
 
 /// A recrangle on a map - used to characterise a room.
 #[derive(Clone, Copy, Debug)]

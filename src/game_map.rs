@@ -1,6 +1,6 @@
-pub mod tile;
-pub mod map;
-pub mod room;
+mod tile;
+mod map;
+mod room;
 mod dungeon_generator;
 
 // reexport to hide the game_map implementation

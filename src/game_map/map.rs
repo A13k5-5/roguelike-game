@@ -1,4 +1,4 @@
-use crate::Tile;
+use super::tile::Tile;
 
 // size of the map
 pub const MAP_WIDTH: i32 = 80;
