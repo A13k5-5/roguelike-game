@@ -2,7 +2,8 @@ use rand::RngExt;
 use crate::game_map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use crate::{Object};
 use super::tile::Tile;
-use super::room::{create_h_tunnel, create_room, create_v_tunnel, Rect};
+use super::room::{Rect};
+use super::room;
 
 // parameters for dungeon generator
 const ROOM_MAX_SIZE: i32 = 10;
@@ -13,7 +14,39 @@ pub fn make_map(player: &mut Object) -> Map {
     // fill map with wall tiles
     let mut map = vec![vec![Tile::wall(); MAP_HEIGHT as usize]; MAP_WIDTH as usize];
 
-    let mut rooms = vec![];
+    let rooms = generate_rooms();
+
+    // set player's initial position to centre of first room
+    let (new_x, new_y) = rooms.first().unwrap().centre();
+    player.x = new_x;
+    player.y = new_y;
+
+    // draw all the rooms
+    for r in &rooms[..] {
+        room::create_room(r, &mut map);
+    }
+
+    // draw tunnels between rooms
+    for i in 1..rooms.len() {
+        let (cur_x, cur_y) = rooms.get(i).unwrap().centre();
+        let (prev_x, prev_y) = rooms.get(i - 1).unwrap().centre();
+
+        // horizontal and then vertical or the other way around
+        if rand::random() {
+            room::create_h_tunnel(cur_x, prev_x, cur_y, &mut map);
+            room::create_v_tunnel(cur_y, prev_y, prev_x, &mut map);
+        } else {
+            room::create_v_tunnel(cur_y, prev_y, cur_x, &mut map);
+            room::create_h_tunnel(cur_x, prev_x, prev_y, &mut map);
+        }
+    }
+
+    map
+}
+
+fn generate_rooms() -> Vec<Rect> {
+
+    let mut rooms: Vec<Rect> = Vec::new();
 
     for _ in 0..MAX_ROOMS {
         // for _ in 0..5 {
@@ -32,37 +65,11 @@ pub fn make_map(player: &mut Object) -> Map {
             .any(|other_room| new_room.intersects_with(other_room));
 
         if failed {
-            continue
-        }
-
-        let (new_x, new_y) = new_room.centre();
-        create_room(new_room, &mut map);
-
-        match rooms.is_empty() {
-            true => {
-                // this is the first room, where the player is spawned
-                player.x = new_x;
-                player.y = new_y;
-            }
-            false => {
-                // all the other rooms
-                // connect it to the previous room with a tunnel
-
-                let (prev_x, prev_y) = rooms.last().unwrap().centre();
-
-                // horizontal and then vertical or the other way around
-                if rand::random() {
-                    create_h_tunnel(new_x, prev_x, new_y, &mut map);
-                    create_v_tunnel(new_y, prev_y, prev_x, &mut map);
-                } else {
-                    create_v_tunnel(new_y, prev_y, new_x, &mut map);
-                    create_h_tunnel(new_x, prev_x, prev_y, &mut map);
-                }
-            }
+            continue;
         }
 
         rooms.push(new_room);
     }
 
-    map
+    rooms
 }
