@@ -3,7 +3,7 @@ use crate::game_map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use crate::{Object};
 use super::tile::Tile;
 use super::room::{Rect};
-use super::room;
+use super::map;
 
 // parameters for dungeon generator
 const ROOM_MAX_SIZE: i32 = 10;
@@ -23,7 +23,7 @@ pub fn make_map(player: &mut Object) -> Map {
 
     // draw all the rooms
     for r in &rooms[..] {
-        room::create_room(r, &mut map);
+        map::create_room(r, &mut map);
     }
 
     // draw tunnels between rooms
@@ -33,11 +33,11 @@ pub fn make_map(player: &mut Object) -> Map {
 
         // horizontal and then vertical or the other way around
         if rand::random() {
-            room::create_h_tunnel(cur_x, prev_x, cur_y, &mut map);
-            room::create_v_tunnel(cur_y, prev_y, prev_x, &mut map);
+            map::create_h_tunnel(cur_x, prev_x, cur_y, &mut map);
+            map::create_v_tunnel(cur_y, prev_y, prev_x, &mut map);
         } else {
-            room::create_v_tunnel(cur_y, prev_y, cur_x, &mut map);
-            room::create_h_tunnel(cur_x, prev_x, prev_y, &mut map);
+            map::create_v_tunnel(cur_y, prev_y, cur_x, &mut map);
+            map::create_h_tunnel(cur_x, prev_x, prev_y, &mut map);
         }
     }
 
@@ -49,7 +49,6 @@ fn generate_rooms() -> Vec<Rect> {
     let mut rooms: Vec<Rect> = Vec::new();
 
     for _ in 0..MAX_ROOMS {
-        // for _ in 0..5 {
         // random size
         let w = rand::rng().random_range(ROOM_MIN_SIZE..=ROOM_MAX_SIZE);
         let h = rand::rng().random_range(ROOM_MIN_SIZE..=ROOM_MAX_SIZE);
