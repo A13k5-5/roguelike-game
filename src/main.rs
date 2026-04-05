@@ -1,11 +1,13 @@
 mod game_map;
 mod game_object;
 mod controls;
+mod fov_map;
 
 use game_object::Object;
 
 use tcod::colors::*;
 use tcod::console::*;
+use tcod::map::Map as FovMap;
 
 const SCREEN_WIDTH: i32 = 80;
 const SCREEN_HEIGHT: i32 = 50;
@@ -15,6 +17,7 @@ const LIMIT_FPS: i32 = 20;
 struct Tcod {
     root: Root,
     con: Offscreen,
+    fov: FovMap,
 }
 
 fn render_all(tcod: &mut Tcod, game: &game_map::Game, objects: &[Object]) {
@@ -47,9 +50,11 @@ fn main() {
         .title("Rust/libtcod tutorial")
         .init();
 
-    let con = Offscreen::new(game_map::MAP_WIDTH, game_map::MAP_HEIGHT);
-
-    let mut tcod = Tcod { root, con };
+    let mut tcod = Tcod {
+        root,
+        con: Offscreen::new(game_map::MAP_WIDTH, game_map::MAP_HEIGHT),
+        fov: FovMap::new(game_map::MAP_WIDTH, game_map::MAP_HEIGHT),
+    };
 
     // create object representing the player
     let mut player = Object::new(0, 0, '@', WHITE);
@@ -57,6 +62,8 @@ fn main() {
     let game = game_map::Game {
         map: game_map::make_map(&mut player)
     };
+
+    fov_map::populate_fov_map(&mut tcod.fov, &game.map);
 
     // create an NPC
     let npc = Object::new(SCREEN_WIDTH / 2 -5, SCREEN_HEIGHT / 2 - 5, '@', GREEN);
