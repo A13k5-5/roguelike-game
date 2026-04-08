@@ -21,7 +21,7 @@ struct Tcod {
     fov: FovMap,
 }
 
-fn render_all(tcod: &mut Tcod, game: &game_map::Game, objects: &[Object], fov_recompute: bool) {
+fn render_all(tcod: &mut Tcod, game: &mut game_map::Game, objects: &[Object], fov_recompute: bool) {
     if fov_recompute {
         let player = &objects[0];
         tcod.fov.compute_fov(player.x, player.y, fov_map::TORCH_RADIUS, FOV_LIGHT_WALL, FOV_ALGO);
@@ -67,7 +67,7 @@ fn main() {
     // create object representing the player
     let mut player = Object::new(0, 0, '@', WHITE);
 
-    let game = game_map::Game {
+    let mut game = game_map::Game {
         map: game_map::make_map(&mut player)
     };
 
@@ -82,7 +82,7 @@ fn main() {
     while !tcod.root.window_closed() {
         tcod.con.clear();
         let fov_recompute = previous_player_position != (objects[0].x, objects[0].y);
-        render_all(&mut tcod, &game, &objects, fov_recompute);
+        render_all(&mut tcod, &mut game, &objects, fov_recompute);
         tcod.root.flush();
 
         let player = &mut objects[0];

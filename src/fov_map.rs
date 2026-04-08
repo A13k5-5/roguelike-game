@@ -1,4 +1,3 @@
-use tcod::Color;
 use tcod::map::{FovAlgorithm, Map as FovMap};
 use crate::game_map;
 

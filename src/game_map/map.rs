@@ -33,12 +33,19 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn draw_map(&self, tcod: &mut Tcod) {
+    pub fn draw_map(&mut self, tcod: &mut Tcod) {
         // go through all the tiles and set their background colour
         for y in 0..MAP_HEIGHT {
             for x in 0..MAP_WIDTH {
+                let tile = &mut self.map[x as usize][y as usize];
                 let is_visible = tcod.fov.is_in_fov(x, y);
-                let is_wall = self.map[x as usize][y as usize].blocks_sight();
+                if is_visible {
+                    tile.explore();
+                }
+                if !tile.is_explored() {
+                    continue;
+                }
+                let is_wall = tile.blocks_sight();
                 let color = Self::get_color(is_visible, is_wall);
                 tcod.con.set_char_background(x, y, color, BackgroundFlag::Set);
             }
