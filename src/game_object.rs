@@ -32,5 +32,14 @@ impl Object {
         con.set_default_foreground(self.color);
         con.put_char(self.x, self.y, self.char, BackgroundFlag::None);
     }
+
+    pub fn set_pos(&mut self, point: (i32, i32)) {
+        self.x = point.0;
+        self.y = point.1;
+    }
+
+    pub fn pos(&self) -> (i32, i32) {
+        (self.x, self.y)
+    }
 }
 

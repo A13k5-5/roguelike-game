@@ -1,7 +1,7 @@
 use rand::RngExt;
 use tcod::colors;
 use crate::game_map::{Map, MAP_HEIGHT, MAP_WIDTH};
-use crate::{Object};
+use crate::{Object, PLAYER};
 use super::tile::Tile;
 use super::room::{Rect};
 use super::map;
@@ -18,17 +18,16 @@ pub fn make_map(objects: &mut Vec<Object>) -> Map {
 
     let rooms = generate_rooms();
 
-    let player = &mut objects[0];
+    let player = &mut objects[PLAYER];
     // set player's initial position to centre of first room
-    let (new_x, new_y) = rooms.first().unwrap().centre();
-    player.x = new_x;
-    player.y = new_y;
+    player.set_pos(rooms.first().unwrap().centre());
 
     // mark all the rooms in the map
     for r in &rooms[..] {
         map::create_room(r, &mut map);
     }
 
+    // place monsters in each room
     for r in &rooms[..] {
         place_objects(r, objects);
     }

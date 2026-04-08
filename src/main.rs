@@ -12,6 +12,7 @@ use crate::fov_map::{FOV_ALGO, FOV_LIGHT_WALL};
 
 const SCREEN_WIDTH: i32 = 80;
 const SCREEN_HEIGHT: i32 = 50;
+const PLAYER: usize = 0;
 
 const LIMIT_FPS: i32 = 20;
 
@@ -23,7 +24,7 @@ struct Tcod {
 
 fn render_all(tcod: &mut Tcod, game: &mut game_map::Game, objects: &[Object], fov_recompute: bool) {
     if fov_recompute {
-        let player = &objects[0];
+        let player = &objects[PLAYER];
         tcod.fov.compute_fov(player.x, player.y, fov_map::TORCH_RADIUS, FOV_LIGHT_WALL, FOV_ALGO);
     }
 
@@ -81,7 +82,7 @@ fn main() {
         render_all(&mut tcod, &mut game, &objects, fov_recompute);
         tcod.root.flush();
 
-        let player = &mut objects[0];
+        let player = &mut objects[PLAYER];
         previous_player_position = (player.x, player.y);
         let exit = controls::handle_keys(&mut tcod, player, &game);
         if exit {
