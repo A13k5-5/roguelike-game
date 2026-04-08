@@ -8,6 +8,7 @@ use game_object::Object;
 use tcod::colors::*;
 use tcod::console::*;
 use tcod::map::Map as FovMap;
+use crate::fov_map::{FOV_ALGO, FOV_LIGHT_WALL};
 
 const SCREEN_WIDTH: i32 = 80;
 const SCREEN_HEIGHT: i32 = 50;
@@ -20,10 +21,17 @@ struct Tcod {
     fov: FovMap,
 }
 
-fn render_all(tcod: &mut Tcod, game: &game_map::Game, objects: &[Object]) {
-    // draw all objects in the list
+fn render_all(tcod: &mut Tcod, game: &game_map::Game, objects: &[Object], fov_recompute: bool) {
+    if fov_recompute {
+        let player = &objects[0];
+        tcod.fov.compute_fov(player.x, player.y, fov_map::TORCH_RADIUS, FOV_LIGHT_WALL, FOV_ALGO);
+    }
+
+    // draw all visible objects from the list
     for object in objects {
-        object.draw(&mut tcod.con);
+        if tcod.fov.is_in_fov(object.x, object.y) {
+            object.draw(&mut tcod.con);
+        }
     }
 
     game.draw_map(tcod);
@@ -70,13 +78,15 @@ fn main() {
 
     let mut objects = [player, npc];
 
+    let mut previous_player_position = (-1, -1);
     while !tcod.root.window_closed() {
         tcod.con.clear();
-
-        render_all(&mut tcod, &game, &objects);
+        let fov_recompute = previous_player_position != (objects[0].x, objects[0].y);
+        render_all(&mut tcod, &game, &objects, fov_recompute);
         tcod.root.flush();
 
         let player = &mut objects[0];
+        previous_player_position = (player.x, player.y);
         let exit = controls::handle_keys(&mut tcod, player, &game);
         if exit {
             break;
