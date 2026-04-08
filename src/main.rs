@@ -65,18 +65,14 @@ fn main() {
     };
 
     // create object representing the player
-    let mut player = Object::new(0, 0, '@', WHITE);
+    let player = Object::new(0, 0, '@', WHITE);
+    let mut objects = vec![player];
 
     let mut game = game_map::Game {
-        map: game_map::make_map(&mut player)
+        map: game_map::make_map(&mut objects)
     };
 
     fov_map::populate_fov_map(&mut tcod.fov, &game.map);
-
-    // create an NPC
-    let npc = Object::new(SCREEN_WIDTH / 2 -5, SCREEN_HEIGHT / 2 - 5, '@', GREEN);
-
-    let mut objects = [player, npc];
 
     let mut previous_player_position = (-1, -1);
     while !tcod.root.window_closed() {

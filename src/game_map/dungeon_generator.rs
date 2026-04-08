@@ -1,4 +1,5 @@
 use rand::RngExt;
+use tcod::colors;
 use crate::game_map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use crate::{Object};
 use super::tile::Tile;
@@ -9,21 +10,27 @@ use super::map;
 const ROOM_MAX_SIZE: i32 = 10;
 const ROOM_MIN_SIZE: i32 = 6;
 const MAX_ROOMS: i32 = 30;
+const MAX_ROOM_MONSTERS: i32 = 3;
 
-pub fn make_map(player: &mut Object) -> Map {
+pub fn make_map(objects: &mut Vec<Object>) -> Map {
     // fill map with wall tiles
     let mut map = vec![vec![Tile::wall(); MAP_HEIGHT as usize]; MAP_WIDTH as usize];
 
     let rooms = generate_rooms();
 
+    let player = &mut objects[0];
     // set player's initial position to centre of first room
     let (new_x, new_y) = rooms.first().unwrap().centre();
     player.x = new_x;
     player.y = new_y;
 
-    // draw all the rooms
+    // mark all the rooms in the map
     for r in &rooms[..] {
         map::create_room(r, &mut map);
+    }
+
+    for r in &rooms[..] {
+        place_objects(r, objects);
     }
 
     // draw tunnels between rooms
@@ -71,4 +78,25 @@ fn generate_rooms() -> Vec<Rect> {
     }
 
     rooms
+}
+
+fn place_objects(room: &Rect, objects: &mut Vec<Object>) {
+    let num_monsters = rand::rng().random_range(0..=MAX_ROOM_MONSTERS);
+
+    for _ in 0..num_monsters {
+        let x = rand::rng().random_range(room.x1 + 1..room.x2);
+        let y = rand::rng().random_range(room.y1 + 1..room.y2);
+
+        //80% change of generating an orc
+        let monster = match rand::random::<f32>() < 0.8 {
+            true => {
+                Object::new(x, y, 'o', colors::DESATURATED_GREEN)
+            },
+            false => {
+                Object::new(x, y, 'T', colors::DARKER_GREEN)
+            }
+        };
+
+        objects.push(monster);
+    }
 }
