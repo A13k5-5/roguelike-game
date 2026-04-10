@@ -64,14 +64,15 @@ impl Game {
         }
     }
 
-    pub fn is_blocked(&self, x: i32, y: i32, objects: &[Object]) -> bool {
-        if self.map[x as usize][y as usize].blocks() {
-            return true;
-        }
+}
 
-        objects.iter()
-            .any(|object| object.blocks() && object.pos() == (x, y))
+pub fn is_blocked(map: &Map, x: i32, y: i32, objects: &[Object]) -> bool {
+    if map[x as usize][y as usize].blocks() {
+        return true;
     }
+
+    objects.iter()
+        .any(|object| object.blocks() && object.pos() == (x, y))
 }
 
 pub fn create_room(room: &Rect, map: &mut Map) {

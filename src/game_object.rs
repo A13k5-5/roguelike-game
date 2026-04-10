@@ -47,12 +47,12 @@ impl Object {
 }
 
 // move by the given amount
-pub fn move_by(id: usize, dx: i32, dy: i32, game: &game_map::Game, objects: &mut [Object]) {
+pub fn move_by(id: usize, dx: i32, dy: i32, map: &game_map::Map, objects: &mut [Object]) {
 
     let (x, y) = objects[id].pos();
 
     // if blocked wall, not possible to get there
-    if game.is_blocked(x + dx, y + dy, objects) {
+    if game_map::is_blocked(map, x + dx, y + dy, objects) {
         return;
     }
 

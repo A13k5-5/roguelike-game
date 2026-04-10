@@ -83,7 +83,7 @@ fn main() {
         tcod.root.flush();
 
         previous_player_position = objects[PLAYER].pos();
-        let exit = controls::handle_keys(&mut tcod, &mut objects, &game);
+        let exit = controls::handle_keys(&mut tcod, &mut objects, &game.map);
         if exit {
             break;
         }
