@@ -89,10 +89,10 @@ fn place_objects(room: &Rect, objects: &mut Vec<Object>) {
         //80% change of generating an orc
         let monster = match rand::random::<f32>() < 0.8 {
             true => {
-                Object::new(x, y, 'o', colors::DESATURATED_GREEN)
+                Object::new(x, y, 'o', colors::DESATURATED_GREEN, "name", true)
             },
             false => {
-                Object::new(x, y, 'T', colors::DARKER_GREEN)
+                Object::new(x, y, 'T', colors::DARKER_GREEN, "name", true)
             }
         };
 

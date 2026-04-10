@@ -7,12 +7,23 @@ pub struct Object {
     pub x: i32,
     pub y: i32,
     char: char,
-    color: Color
+    color: Color,
+    name: String,
+    blocks: bool,
+    alive: bool
 }
 
 impl Object {
-    pub fn new(x: i32, y: i32, char: char, color: Color) -> Self {
-        Object{ x, y, char, color }
+    pub fn new(x: i32, y: i32, char: char, color: Color, name: &str, blocks: bool) -> Self {
+        Object{
+            x,
+            y,
+            char,
+            color,
+            name: name.into(),
+            blocks,
+            alive: false
+        }
     }
 
     // move by the given amount

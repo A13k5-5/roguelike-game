@@ -66,7 +66,7 @@ fn main() {
     };
 
     // create object representing the player
-    let player = Object::new(0, 0, '@', WHITE);
+    let player = Object::new(0, 0, '@', WHITE, "player", true);
     let mut objects = vec![player];
 
     let mut game = game_map::Game {
