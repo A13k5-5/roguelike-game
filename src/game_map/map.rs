@@ -1,5 +1,6 @@
 use std::cmp;
 use tcod::{BackgroundFlag, Color, Console};
+use crate::game_object::Object;
 use super::room::Rect;
 use crate::Tcod;
 use super::tile::Tile;
@@ -61,6 +62,15 @@ impl Game {
             (true, true) => COLOR_LIGHT_WALL,
             (true, false) => COLOR_LIGHT_GROUND,
         }
+    }
+
+    pub fn is_blocked(&self, x: i32, y: i32, objects: &[Object]) -> bool {
+        if self.map[x as usize][y as usize].blocks() {
+            return true;
+        }
+
+        objects.iter()
+            .any(|object| object.blocks() && object.pos() == (x, y))
     }
 }
 

@@ -26,18 +26,6 @@ impl Object {
         }
     }
 
-    // move by the given amount
-    pub fn move_by(&mut self, dx: i32, dy: i32, game: &game_map::Game) {
-
-        // if blocked wall, not possible to get there
-        if game.map[(self.x + dx) as usize][(self.y + dy) as usize].blocks() {
-            return;
-        }
-
-        self.x += dx;
-        self.y += dy;
-    }
-
     // set the colour and then draw the char of this object at its position
     pub fn draw(&self, con: &mut dyn Console) {
         con.set_default_foreground(self.color);
@@ -52,5 +40,21 @@ impl Object {
     pub fn pos(&self) -> (i32, i32) {
         (self.x, self.y)
     }
+
+    pub fn blocks(&self) -> bool {
+        self.blocks
+    }
 }
 
+// move by the given amount
+pub fn move_by(id: usize, dx: i32, dy: i32, game: &game_map::Game, objects: &mut [Object]) {
+
+    let (x, y) = objects[id].pos();
+
+    // if blocked wall, not possible to get there
+    if game.is_blocked(x + dx, y + dy, objects) {
+        return;
+    }
+
+    objects[id].set_pos((x + dx, y + dy));
+}

@@ -82,9 +82,8 @@ fn main() {
         render_all(&mut tcod, &mut game, &objects, fov_recompute);
         tcod.root.flush();
 
-        let player = &mut objects[PLAYER];
-        previous_player_position = (player.x, player.y);
-        let exit = controls::handle_keys(&mut tcod, player, &game);
+        previous_player_position = objects[PLAYER].pos();
+        let exit = controls::handle_keys(&mut tcod, &mut objects, &game);
         if exit {
             break;
         }
