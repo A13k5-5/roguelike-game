@@ -1,6 +1,7 @@
 use super::actions::PlayerAction;
 use crate::game_object::Object;
-use crate::{PLAYER, Tcod, game_map, game_object};
+use crate::game_object::object;
+use crate::{PLAYER, Tcod, game_map};
 
 pub fn handle_keys(tcod: &mut Tcod, objects: &mut [Object], map: &game_map::Map) -> PlayerAction {
     use tcod::input::*;
@@ -39,7 +40,7 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut [Object], map: &game_map::Map)
             },
             _,
             true,
-        ) => game_object::player_more_or_attack(0, -1, map, objects),
+        ) => object::player_more_or_attack(0, -1, map, objects),
         (
             Key {
                 code: KeyCode::Down,
@@ -47,7 +48,7 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut [Object], map: &game_map::Map)
             },
             _,
             true,
-        ) => game_object::player_more_or_attack(0, 1, map, objects),
+        ) => object::player_more_or_attack(0, 1, map, objects),
         (
             Key {
                 code: KeyCode::Left,
@@ -55,7 +56,7 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut [Object], map: &game_map::Map)
             },
             _,
             true,
-        ) => game_object::player_more_or_attack(-1, 0, map, objects),
+        ) => object::player_more_or_attack(-1, 0, map, objects),
         (
             Key {
                 code: KeyCode::Right,
@@ -63,7 +64,7 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut [Object], map: &game_map::Map)
             },
             _,
             true,
-        ) => game_object::player_more_or_attack(1, 0, map, objects),
+        ) => object::player_more_or_attack(1, 0, map, objects),
 
         _ => return PlayerAction::DidntTakeTurn,
     }

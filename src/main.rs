@@ -3,13 +3,12 @@ mod fov_map;
 mod game_map;
 mod game_object;
 
-use game_object::Object;
-
 use crate::fov_map::{FOV_ALGO, FOV_LIGHT_WALL};
 use tcod::colors::*;
 use tcod::console::*;
 use tcod::map::Map as FovMap;
 use controls::PlayerAction;
+use game_object::Object;
 
 const SCREEN_WIDTH: i32 = 80;
 const SCREEN_HEIGHT: i32 = 50;
