@@ -1,5 +1,6 @@
 use crate::{game_map, PLAYER};
 use tcod::{BackgroundFlag, Color, Console};
+use super::components;
 
 // any game object
 #[derive(Debug)]
@@ -11,6 +12,8 @@ pub struct Object {
     name: String,
     blocks: bool,
     pub alive: bool,
+    fighter: Option<components::Fighter>,
+    ai: Option<components::Ai>
 }
 
 impl Object {
@@ -23,6 +26,8 @@ impl Object {
             name: name.into(),
             blocks,
             alive: false,
+            fighter: None,
+            ai: None
         }
     }
 
