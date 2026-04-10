@@ -2,7 +2,7 @@
 pub struct Tile {
     blocked: bool,
     block_sight: bool,
-    explored: bool
+    explored: bool,
 }
 
 impl Tile {

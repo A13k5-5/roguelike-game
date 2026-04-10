@@ -1,10 +1,10 @@
-use rand::RngExt;
-use tcod::colors;
+use super::map;
+use super::room::Rect;
+use super::tile::Tile;
 use crate::game_map::{MAP_HEIGHT, MAP_WIDTH};
 use crate::{Object, PLAYER, game_map};
-use super::tile::Tile;
-use super::room::{Rect};
-use super::map;
+use rand::RngExt;
+use tcod::colors;
 
 // parameters for dungeon generator
 const ROOM_MAX_SIZE: i32 = 10;
@@ -51,7 +51,6 @@ pub fn make_map(objects: &mut Vec<Object>) -> game_map::Map {
 }
 
 fn generate_rooms() -> Vec<Rect> {
-
     let mut rooms: Vec<Rect> = Vec::new();
 
     for _ in 0..MAX_ROOMS {
@@ -91,14 +90,12 @@ fn place_objects(room: &Rect, map: &game_map::Map, objects: &mut Vec<Object>) {
         }
 
         //80% change of generating an orc
-        let monster = match rand::random::<f32>() < 0.8 {
-            true => {
-                Object::new(x, y, 'o', colors::DESATURATED_GREEN, "name", true)
-            },
-            false => {
-                Object::new(x, y, 'T', colors::DARKER_GREEN, "name", true)
-            }
+        let mut monster = match rand::random::<f32>() < 0.8 {
+            true => Object::new(x, y, 'o', colors::DESATURATED_GREEN, "orc", true),
+            false => Object::new(x, y, 'T', colors::DARKER_GREEN, "troll", true),
         };
+
+        monster.alive = true;
 
         objects.push(monster);
     }

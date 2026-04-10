@@ -1,12 +1,12 @@
+use super::room::Rect;
+use super::tile::Tile;
+use crate::Tcod;
+use crate::game_object::Object;
 use std::cmp;
 use tcod::{BackgroundFlag, Color, Console};
-use crate::game_object::Object;
-use super::room::Rect;
-use crate::Tcod;
-use super::tile::Tile;
 
 // colours of the map
-const COLOR_DARK_WALL: Color = Color { r: 0, g: 0, b: 100};
+const COLOR_DARK_WALL: Color = Color { r: 0, g: 0, b: 100 };
 const COLOR_LIGHT_WALL: Color = Color {
     r: 130,
     g: 110,
@@ -30,7 +30,7 @@ pub const MAP_HEIGHT: i32 = 50;
 pub type Map = Vec<Vec<Tile>>;
 
 pub struct Game {
-    pub map: Map
+    pub map: Map,
 }
 
 impl Game {
@@ -48,7 +48,8 @@ impl Game {
                 }
                 let is_wall = tile.blocks_sight();
                 let color = Self::get_color(is_visible, is_wall);
-                tcod.con.set_char_background(x, y, color, BackgroundFlag::Set);
+                tcod.con
+                    .set_char_background(x, y, color, BackgroundFlag::Set);
             }
         }
     }
@@ -63,7 +64,6 @@ impl Game {
             (true, false) => COLOR_LIGHT_GROUND,
         }
     }
-
 }
 
 pub fn is_blocked(map: &Map, x: i32, y: i32, objects: &[Object]) -> bool {
@@ -71,7 +71,8 @@ pub fn is_blocked(map: &Map, x: i32, y: i32, objects: &[Object]) -> bool {
         return true;
     }
 
-    objects.iter()
+    objects
+        .iter()
         .any(|object| object.blocks() && object.pos() == (x, y))
 }
 
@@ -97,4 +98,3 @@ pub fn create_v_tunnel(y1: i32, y2: i32, x: i32, map: &mut Map) {
         map[x as usize][y as usize] = Tile::empty();
     }
 }
-

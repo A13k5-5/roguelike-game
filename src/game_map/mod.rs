@@ -1,8 +1,8 @@
-mod tile;
+mod dungeon_generator;
 mod map;
 mod room;
-mod dungeon_generator;
+mod tile;
 
 // reexport to hide the game_map implementation
-pub use map::*;
 pub use dungeon_generator::make_map;
+pub use map::*;

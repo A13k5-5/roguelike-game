@@ -1,5 +1,5 @@
-use tcod::map::{FovAlgorithm, Map as FovMap};
 use crate::game_map;
+use tcod::map::{FovAlgorithm, Map as FovMap};
 
 pub const FOV_ALGO: FovAlgorithm = FovAlgorithm::Basic;
 pub const FOV_LIGHT_WALL: bool = true;

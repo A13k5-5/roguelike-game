@@ -1,14 +1,15 @@
-mod game_map;
-mod game_object;
 mod controls;
 mod fov_map;
+mod game_map;
+mod game_object;
 
 use game_object::Object;
 
+use crate::fov_map::{FOV_ALGO, FOV_LIGHT_WALL};
 use tcod::colors::*;
 use tcod::console::*;
 use tcod::map::Map as FovMap;
-use crate::fov_map::{FOV_ALGO, FOV_LIGHT_WALL};
+use controls::PlayerAction;
 
 const SCREEN_WIDTH: i32 = 80;
 const SCREEN_HEIGHT: i32 = 50;
@@ -25,7 +26,13 @@ struct Tcod {
 fn render_all(tcod: &mut Tcod, game: &mut game_map::Game, objects: &[Object], fov_recompute: bool) {
     if fov_recompute {
         let player = &objects[PLAYER];
-        tcod.fov.compute_fov(player.x, player.y, fov_map::TORCH_RADIUS, FOV_LIGHT_WALL, FOV_ALGO);
+        tcod.fov.compute_fov(
+            player.x,
+            player.y,
+            fov_map::TORCH_RADIUS,
+            FOV_LIGHT_WALL,
+            FOV_ALGO,
+        );
     }
 
     // draw all visible objects from the list
@@ -44,10 +51,9 @@ fn render_all(tcod: &mut Tcod, game: &mut game_map::Game, objects: &[Object], fo
         &mut tcod.root,
         (0, 0),
         1.0,
-        1.0
+        1.0,
     );
 }
-
 
 fn main() {
     tcod::system::set_fps(LIMIT_FPS);
@@ -66,11 +72,13 @@ fn main() {
     };
 
     // create object representing the player
-    let player = Object::new(0, 0, '@', WHITE, "player", true);
+    let mut player = Object::new(0, 0, '@', WHITE, "player", true);
+    player.alive = true;
+
     let mut objects = vec![player];
 
     let mut game = game_map::Game {
-        map: game_map::make_map(&mut objects)
+        map: game_map::make_map(&mut objects),
     };
 
     fov_map::populate_fov_map(&mut tcod.fov, &game.map);
@@ -83,8 +91,8 @@ fn main() {
         tcod.root.flush();
 
         previous_player_position = objects[PLAYER].pos();
-        let exit = controls::handle_keys(&mut tcod, &mut objects, &game.map);
-        if exit {
+        let player_action = controls::handle_keys(&mut tcod, &mut objects, &game.map);
+        if player_action == PlayerAction::Exit {
             break;
         }
     }

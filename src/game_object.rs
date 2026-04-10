@@ -1,5 +1,5 @@
-use tcod::{BackgroundFlag, Color, Console};
 use crate::game_map;
+use tcod::{BackgroundFlag, Color, Console};
 
 // any game object
 #[derive(Debug)]
@@ -10,19 +10,19 @@ pub struct Object {
     color: Color,
     name: String,
     blocks: bool,
-    alive: bool
+    pub alive: bool,
 }
 
 impl Object {
     pub fn new(x: i32, y: i32, char: char, color: Color, name: &str, blocks: bool) -> Self {
-        Object{
+        Object {
             x,
             y,
             char,
             color,
             name: name.into(),
             blocks,
-            alive: false
+            alive: false,
         }
     }
 
@@ -48,7 +48,6 @@ impl Object {
 
 // move by the given amount
 pub fn move_by(id: usize, dx: i32, dy: i32, map: &game_map::Map, objects: &mut [Object]) {
-
     let (x, y) = objects[id].pos();
 
     // if blocked wall, not possible to get there
