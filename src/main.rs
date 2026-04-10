@@ -92,8 +92,18 @@ fn main() {
 
         previous_player_position = objects[PLAYER].pos();
         let player_action = controls::handle_keys(&mut tcod, &mut objects, &game.map);
+
         if player_action == PlayerAction::Exit {
             break;
         }
+
+        // if objects[PLAYER].alive && player_action != PlayerAction::DidntTakeTurn {
+        //     for object in &objects {
+        //         // all objects but the player themself
+        //         if (object as *const _) != (&objects[PLAYER] as *const _) {
+        //             println!("The {} growls", object.name())
+        //         }
+        //     }
+        // }
     }
 }

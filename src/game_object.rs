@@ -1,4 +1,4 @@
-use crate::game_map;
+use crate::{game_map, PLAYER};
 use tcod::{BackgroundFlag, Color, Console};
 
 // any game object
@@ -44,6 +44,10 @@ impl Object {
     pub fn blocks(&self) -> bool {
         self.blocks
     }
+
+    pub fn name(&self) -> &str {
+        self.name.as_str()
+    }
 }
 
 // move by the given amount
@@ -56,4 +60,24 @@ pub fn move_by(id: usize, dx: i32, dy: i32, map: &game_map::Map, objects: &mut [
     }
 
     objects[id].set_pos((x + dx, y + dy));
+}
+
+pub fn player_more_or_attack(dx: i32, dy: i32, map: &game_map::Map, objects: &mut [Object]) {
+    let x = objects[PLAYER].x + dx;
+    let y = objects[PLAYER].y + dy;
+
+    // try to find an attackable object
+    let target_id = objects.iter().position(|object| object.pos() == (x, y));
+
+    match target_id {
+        Some(target_id) => {
+            println!(
+                "The {} laughs at your puny efforts to attack him!",
+                objects[target_id].name()
+            )
+        }
+        None => {
+            move_by(PLAYER, dx, dy, &map, objects);
+        }
+    }
 }

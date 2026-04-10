@@ -39,7 +39,7 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut [Object], map: &game_map::Map)
             },
             _,
             true,
-        ) => game_object::move_by(PLAYER, 0, -1, map, objects),
+        ) => game_object::player_more_or_attack(0, -1, map, objects),
         (
             Key {
                 code: KeyCode::Down,
@@ -47,7 +47,7 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut [Object], map: &game_map::Map)
             },
             _,
             true,
-        ) => game_object::move_by(PLAYER, 0, 1, map, objects),
+        ) => game_object::player_more_or_attack(0, 1, map, objects),
         (
             Key {
                 code: KeyCode::Left,
@@ -55,7 +55,7 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut [Object], map: &game_map::Map)
             },
             _,
             true,
-        ) => game_object::move_by(PLAYER, -1, 0, map, objects),
+        ) => game_object::player_more_or_attack(-1, 0, map, objects),
         (
             Key {
                 code: KeyCode::Right,
@@ -63,7 +63,7 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut [Object], map: &game_map::Map)
             },
             _,
             true,
-        ) => game_object::move_by(PLAYER, 1, 0, map, objects),
+        ) => game_object::player_more_or_attack(1, 0, map, objects),
 
         _ => return PlayerAction::DidntTakeTurn,
     }
