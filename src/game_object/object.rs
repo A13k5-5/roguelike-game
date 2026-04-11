@@ -19,7 +19,7 @@ pub struct Object {
 }
 
 impl Object {
-    pub fn new(x: i32, y: i32, char: char, color: Color, name: &str, blocks: bool) -> Self {
+    fn new(x: i32, y: i32, char: char, color: Color, name: &str, blocks: bool) -> Self {
         Object {
             x,
             y,
@@ -37,7 +37,7 @@ impl Object {
         let mut player = Self::new(0, 0, '@', WHITE, "player", true);
         player.alive = true;
         player.fighter = Some(components::Fighter::new(
-            30, 30, 2, 5
+            30, 30, 2, 5, components::DeathCallback::Player
         ));
         player
     }
@@ -46,7 +46,7 @@ impl Object {
         let mut troll = Object::new(x, y, 'T', colors::DESATURATED_GREEN, "troll", true);
         troll.alive = true;
         troll.fighter = Some(components::Fighter::new(
-            16, 16, 1, 4
+            16, 16, 1, 4, components::DeathCallback::Monster
         ));
         troll.ai = Some(components::Ai::Basic);
         troll
@@ -56,7 +56,7 @@ impl Object {
         let mut orc = Object::new(x, y, 'o', colors::DESATURATED_GREEN, "orc", true);
         orc.alive = true;
         orc.fighter = Some(components::Fighter::new(
-            10, 10, 0, 3
+            10, 10, 0, 3, components::DeathCallback::Monster
         ));
         orc.ai = Some(components::Ai::Basic);
         orc
@@ -73,6 +73,14 @@ impl Object {
         self.y = point.1;
     }
 
+    pub fn set_char(&mut self, new_char: char) {
+        self.char = new_char;
+    }
+
+    pub fn set_color(&mut self, new_color: Color) {
+        self.color = new_color;
+    }
+
     pub fn pos(&self) -> (i32, i32) {
         (self.x, self.y)
     }
@@ -81,12 +89,24 @@ impl Object {
         self.blocks
     }
 
+    pub fn set_blocks(&mut self, blocks: bool) {
+        self.blocks = blocks;
+    }
+
     pub fn name(&self) -> &str {
         self.name.as_str()
     }
 
+    pub fn set_name(&mut self, new_name: String) {
+        self.name = new_name;
+    }
+
     pub fn is_alive(&self) -> bool {
         self.alive
+    }
+
+    fn die(&mut self) {
+        self.alive = false;
     }
 
     pub fn distance_to(&self, other: &Object) -> f32 {
@@ -99,6 +119,14 @@ impl Object {
         if let Some(fighter) = self.fighter.as_mut() {
             fighter.take_damage(damage);
         }
+
+        // check for death, call the death function
+        if let Some(fighter) = self.fighter {
+            if fighter.get_hp() <= 0 {
+                self.die();
+                fighter.on_death.callback(self);
+            }
+        }
     }
 
     pub fn attack(&mut self, target: &mut Object) {
@@ -106,12 +134,12 @@ impl Object {
 
         print!("{} attacks {} ", self.name(), target.name());
 
-        target.take_damage(damage);
         if damage > 0 {
             println!("for {} hit points.", damage);
         } else {
             println!("but it has not effect!")
         }
+        target.take_damage(damage);
     }
 }
 
