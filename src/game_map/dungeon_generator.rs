@@ -23,13 +23,13 @@ pub fn make_map(objects: &mut Vec<Object>) -> game_map::Map {
     player.set_pos(rooms.first().unwrap().centre());
 
     // mark all the rooms in the map
-    for r in &rooms[..] {
+    for r in &rooms {
         map::create_room(r, &mut map);
     }
 
-    // place monsters in each room
-    for r in &rooms[..] {
-        place_monsters(r, &map, objects);
+    // place all the objects into the room
+    for r in &rooms {
+        place_objects_into_room(r, &map, objects);
     }
 
     // draw tunnels between rooms
@@ -78,8 +78,17 @@ fn generate_rooms() -> Vec<Rect> {
     rooms
 }
 
+fn place_objects_into_room(room: &Rect, map: &game_map::Map, objects: &mut Vec<Object>) {
+    place_monsters(room, map, objects);
+    place_items(room, map, objects);
+}
+
 fn place_monsters(room: &Rect, map: &game_map::Map, objects: &mut Vec<Object>) {
     place_objects(room, map, objects, MAX_ROOM_MONSTERS, &generate_monster);
+}
+
+fn place_items(room: &Rect, map: &game_map::Map, objects: &mut Vec<Object>) {
+    place_objects(room, map, objects, MAX_ROOM_ITEMS, &generate_item);
 }
 
 /// General implementation function that randomly generates objects in a room.
