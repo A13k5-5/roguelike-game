@@ -2,7 +2,6 @@ use super::room::Rect;
 use super::tile::Tile;
 use crate::game_object::Object;
 use std::cmp;
-use crate::gui::message_log;
 
 // size of the map
 pub const MAP_WIDTH: i32 = 80;

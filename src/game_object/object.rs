@@ -3,6 +3,7 @@ use tcod::{colors, Color};
 use tcod::colors::{VIOLET, WHITE};
 use crate::game::Game;
 use crate::gui::message_log::Messages;
+use crate::item::Item;
 use super::components;
 
 // any game object
@@ -16,7 +17,8 @@ pub struct Object {
     blocks: bool,
     alive: bool,
     pub fighter: Option<components::Fighter>,
-    pub ai: Option<components::Ai>
+    pub ai: Option<components::Ai>,
+    pub item: Option<Item>
 }
 
 impl Object {
@@ -30,7 +32,8 @@ impl Object {
             blocks,
             alive: false,
             fighter: None,
-            ai: None
+            ai: None,
+            item: None
         }
     }
 
@@ -64,7 +67,10 @@ impl Object {
     }
 
     pub fn new_healing_potion(x: i32, y: i32) -> Self {
-        Object::new(x, y, '!', VIOLET, "healing potion", false)
+        let mut healing_potion = Object::new(x, y, '!', VIOLET, "healing potion", false);
+        healing_potion.item = Some(Item::Heal);
+
+        healing_potion
     }
 
     pub fn set_pos(&mut self, point: (i32, i32)) {

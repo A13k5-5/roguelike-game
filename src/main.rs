@@ -4,6 +4,7 @@ mod game_map;
 mod game_object;
 mod gui;
 mod game;
+mod item;
 
 use tcod::colors::*;
 use tcod::console::*;
@@ -106,7 +107,8 @@ fn main() {
 
     let mut game = game::Game {
         map: game_map::make_map(&mut objects),
-        messages: message_log::Messages::new()
+        messages: message_log::Messages::new(),
+        inventory: vec![]
     };
 
     game.messages.add(

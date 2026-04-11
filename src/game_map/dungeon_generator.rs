@@ -18,10 +18,6 @@ pub fn make_map(objects: &mut Vec<Object>) -> game_map::Map {
 
     let rooms = generate_rooms();
 
-    let player = &mut objects[PLAYER];
-    // set player's initial position to centre of first room
-    player.set_pos(rooms.first().unwrap().centre());
-
     // mark all the rooms in the map
     for r in &rooms {
         map::create_room(r, &mut map);
@@ -31,6 +27,11 @@ pub fn make_map(objects: &mut Vec<Object>) -> game_map::Map {
     for r in &rooms {
         place_objects_into_room(r, &map, objects);
     }
+
+    // set player's initial position to centre of first room
+    let player = &mut objects[PLAYER];
+    player.set_pos(rooms.first().unwrap().centre());
+
 
     // draw tunnels between rooms
     for i in 1..rooms.len() {
@@ -79,7 +80,7 @@ fn generate_rooms() -> Vec<Rect> {
 }
 
 fn place_objects_into_room(room: &Rect, map: &game_map::Map, objects: &mut Vec<Object>) {
-    place_monsters(room, map, objects);
+    // place_monsters(room, map, objects);
     place_items(room, map, objects);
 }
 

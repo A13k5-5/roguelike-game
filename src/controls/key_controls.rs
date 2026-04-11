@@ -3,14 +3,15 @@ use crate::game_object::Object;
 use crate::game_object::object;
 use crate::{PLAYER, Tcod};
 use crate::game::Game;
+use crate::item::pick_item_up;
 
-pub fn handle_keys(tcod: &mut Tcod, objects: &mut [Object], game: &mut Game) -> PlayerAction {
+pub fn handle_keys(tcod: &mut Tcod, objects: &mut Vec<Object>, game: &mut Game) -> PlayerAction {
     use tcod::input::{Key, KeyCode};
 
     let key = tcod.root.wait_for_keypress(true);
     let player_alive = objects[PLAYER].is_alive();
 
-    match (key, key.text(), player_alive) {
+    match (key, key.printable, player_alive) {
         (
             Key {
                 code: KeyCode::Enter,
@@ -66,6 +67,16 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut [Object], game: &mut Game) -> 
             _,
             true,
         ) => object::player_move_or_attack(1, 0, game, objects),
+
+        // pick item
+        (Key { code: KeyCode::Char, .. }, 'g', true) => {
+            let item_id = objects.iter()
+                .position(|object| object.item.is_some() && object.pos() == objects[PLAYER].pos());
+            if let Some(item_id) = item_id {
+                pick_item_up(item_id, game, objects);
+            }
+            return PlayerAction::DidntTakeTurn;
+        }
 
         _ => return PlayerAction::DidntTakeTurn,
     }
