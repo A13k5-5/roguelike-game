@@ -10,6 +10,7 @@ const ROOM_MAX_SIZE: i32 = 10;
 const ROOM_MIN_SIZE: i32 = 6;
 const MAX_ROOMS: i32 = 30;
 const MAX_ROOM_MONSTERS: i32 = 3;
+const MAX_ROOM_ITEMS: i32 = 2;
 
 pub fn make_map(objects: &mut Vec<Object>) -> game_map::Map {
     // fill map with wall tiles
@@ -28,7 +29,7 @@ pub fn make_map(objects: &mut Vec<Object>) -> game_map::Map {
 
     // place monsters in each room
     for r in &rooms[..] {
-        place_objects(r, &map, objects);
+        place_monsters(r, &map, objects);
     }
 
     // draw tunnels between rooms
@@ -77,10 +78,16 @@ fn generate_rooms() -> Vec<Rect> {
     rooms
 }
 
-fn place_objects(room: &Rect, map: &game_map::Map, objects: &mut Vec<Object>) {
-    let num_monsters = rand::rng().random_range(0..=MAX_ROOM_MONSTERS);
+fn place_monsters(room: &Rect, map: &game_map::Map, objects: &mut Vec<Object>) {
+    place_objects(room, map, objects, MAX_ROOM_MONSTERS, &generate_monster);
+}
 
-    for _ in 0..num_monsters {
+/// General implementation function that randomly generates objects in a room.
+/// The objects it generates are generated using the generation_function argument.
+fn place_objects(room: &Rect, map: &game_map::Map, objects: &mut Vec<Object>, max_num_items: i32, generation_function: &dyn Fn(i32, i32) -> Object) {
+    let num_objects = rand::rng().random_range(0..=max_num_items);
+
+    for _ in 0..num_objects {
         let x = rand::rng().random_range(room.x1 + 1..room.x2);
         let y = rand::rng().random_range(room.y1 + 1..room.y2);
 
@@ -88,12 +95,21 @@ fn place_objects(room: &Rect, map: &game_map::Map, objects: &mut Vec<Object>) {
             continue;
         }
 
-        //80% change of generating an orc
-        let monster = match rand::random::<f32>() < 0.8 {
-            true => Object::new_orc(x, y),
-            false => Object::new_troll(x, y),
-        };
+        let object = generation_function(x, y);
 
-        objects.push(monster);
+        objects.push(object);
     }
 }
+
+fn generate_monster(x: i32, y: i32) -> Object {
+    //80% change of generating an orc
+    match rand::random::<f32>() < 0.8 {
+        true => Object::new_orc(x, y),
+        false => Object::new_troll(x, y),
+    }
+}
+
+fn generate_item(x: i32, y: i32) -> Object {
+    Object::new_healing_potion(x, y)
+}
+

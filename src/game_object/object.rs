@@ -1,6 +1,6 @@
 use crate::{game_map, Tcod, PLAYER};
 use tcod::{colors, Color};
-use tcod::colors::WHITE;
+use tcod::colors::{VIOLET, WHITE};
 use crate::game_map::Game;
 use crate::gui::message_log::Messages;
 use super::components;
@@ -61,6 +61,10 @@ impl Object {
         ));
         orc.ai = Some(components::Ai::Basic);
         orc
+    }
+
+    pub fn new_healing_potion(x: i32, y: i32) -> Self {
+        Object::new(x, y, '!', VIOLET, "healing potion", false)
     }
 
     pub fn set_pos(&mut self, point: (i32, i32)) {
