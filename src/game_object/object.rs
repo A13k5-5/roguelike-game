@@ -1,5 +1,5 @@
 use crate::{game_map, Tcod, PLAYER};
-use tcod::{colors, BackgroundFlag, Color, Console};
+use tcod::{colors, Color};
 use tcod::colors::WHITE;
 use crate::game_map::Game;
 use crate::gui::message_log::Messages;

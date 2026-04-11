@@ -22,15 +22,12 @@ const COLOR_LIGHT_GROUND: Color = Color {
 };
 
 
-pub fn draw_map(map: &mut Map, tcod: &mut Tcod) {
+pub fn draw_map(map: &Map, tcod: &mut Tcod) {
     // go through all the tiles and set their background colour
     for y in 0..MAP_HEIGHT {
         for x in 0..MAP_WIDTH {
-            let tile = &mut map[x as usize][y as usize];
+            let tile = &map[x as usize][y as usize];
             let is_visible = tcod.fov.is_in_fov(x, y);
-            if is_visible {
-                tile.explore();
-            }
             if !tile.is_explored() {
                 continue;
             }

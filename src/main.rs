@@ -4,7 +4,6 @@ mod game_map;
 mod game_object;
 mod gui;
 
-use crate::fov_map::{FOV_ALGO, FOV_LIGHT_WALL};
 use tcod::colors::*;
 use tcod::console::*;
 use tcod::map::Map as FovMap;
@@ -32,18 +31,8 @@ struct Tcod {
     fov: FovMap,
 }
 
-fn render_all(tcod: &mut Tcod, game: &mut game_map::Game, objects: &[Object], fov_recompute: bool) {
-    if fov_recompute {
-        let player = &objects[PLAYER];
-        tcod.fov.compute_fov(
-            player.x,
-            player.y,
-            fov_map::TORCH_RADIUS,
-            FOV_LIGHT_WALL,
-            FOV_ALGO,
-        );
-    }
-
+fn render_all(tcod: &mut Tcod, game: &game_map::Game, objects: &[Object]) {
+    // draw all visible objects
     let mut to_draw: Vec<_> = objects.iter()
         .filter(|o| tcod.fov.is_in_fov(o.x, o.y))
         .collect();
@@ -56,7 +45,7 @@ fn render_all(tcod: &mut Tcod, game: &mut game_map::Game, objects: &[Object], fo
         }
     }
 
-    gui::map::draw_map(&mut game.map, tcod);
+    gui::map::draw_map(&game.map, tcod);
 
     blit(
         &tcod.con,
@@ -129,8 +118,14 @@ fn main() {
     let mut previous_player_position = (-1, -1);
     while !tcod.root.window_closed() {
         tcod.con.clear();
-        let fov_recompute = previous_player_position != (objects[0].x, objects[0].y);
-        render_all(&mut tcod, &mut game, &objects, fov_recompute);
+
+        let player = &objects[PLAYER];
+        // recompute field of view if position changed
+        if previous_player_position != player.pos() {
+            fov_map::explore_map(&mut tcod.fov, &mut game.map, player.x, player.y);
+        }
+
+        render_all(&mut tcod, &mut game, &objects);
         tcod.root.flush();
 
         previous_player_position = objects[PLAYER].pos();

@@ -42,7 +42,7 @@ pub fn create_h_tunnel(x1: i32, x2: i32, y: i32, map: &mut Map) {
 }
 
 pub fn create_v_tunnel(y1: i32, y2: i32, x: i32, map: &mut Map) {
-    // horizontal tunnel
+    // vertical tunnel
     for y in cmp::min(y1, y2)..cmp::max(y1, y2) {
         map[x as usize][y as usize] = Tile::empty();
     }
