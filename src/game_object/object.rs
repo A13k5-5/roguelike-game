@@ -63,12 +63,6 @@ impl Object {
         orc
     }
 
-    // set the colour and then draw the char of this object at its position
-    pub fn draw(&self, con: &mut dyn Console) {
-        con.set_default_foreground(self.color);
-        con.put_char(self.x, self.y, self.char, BackgroundFlag::None);
-    }
-
     pub fn set_pos(&mut self, point: (i32, i32)) {
         self.x = point.0;
         self.y = point.1;
@@ -78,8 +72,16 @@ impl Object {
         self.char = new_char;
     }
 
+    pub fn get_char(&self) -> char {
+        self.char
+    }
+
     pub fn set_color(&mut self, new_color: Color) {
         self.color = new_color;
+    }
+
+    pub fn get_color(&self) -> Color {
+        self.color
     }
 
     pub fn pos(&self) -> (i32, i32) {

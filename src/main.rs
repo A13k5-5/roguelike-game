@@ -52,11 +52,11 @@ fn render_all(tcod: &mut Tcod, game: &mut game_map::Game, objects: &[Object], fo
     // draw all visible objects from the list
     for object in &to_draw {
         if tcod.fov.is_in_fov(object.x, object.y) {
-            object.draw(&mut tcod.con);
+            gui::object::draw(object, &mut tcod.con);
         }
     }
 
-    game.draw_map(tcod);
+    gui::map::draw_map(&mut game.map, tcod);
 
     blit(
         &tcod.con,
