@@ -2,6 +2,7 @@ use crate::{game_map, Tcod, PLAYER};
 use tcod::{colors, BackgroundFlag, Color, Console};
 use tcod::colors::WHITE;
 use crate::game_map::Game;
+use crate::gui::message_log::Messages;
 use super::components;
 
 // any game object
@@ -115,7 +116,7 @@ impl Object {
         ((dx.pow(2) + dy.pow(2)) as f32).sqrt()
     }
 
-    pub fn take_damage(&mut self, damage: i32) {
+    pub fn take_damage(&mut self, damage: i32, messages: &mut Messages) {
         if let Some(fighter) = self.fighter.as_mut() {
             fighter.take_damage(damage);
         }
@@ -124,22 +125,24 @@ impl Object {
         if let Some(fighter) = self.fighter {
             if fighter.get_hp() <= 0 {
                 self.die();
-                fighter.on_death.callback(self);
+                fighter.on_death.callback(self, messages);
             }
         }
     }
 
-    pub fn attack(&mut self, target: &mut Object) {
+    pub fn attack(&mut self, target: &mut Object, messages: &mut Messages) {
         let damage = self.fighter.map_or(0, |f| f.get_power()) - target.fighter.map_or(0, |f| f.get_defense());
 
-        print!("{} attacks {} ", self.name(), target.name());
-
         if damage > 0 {
-            println!("for {} hit points.", damage);
+            messages.add(format!("{} attacks {} for {} hit points.", self.name(), target.name(), damage),
+                         WHITE
+            );
         } else {
-            println!("but it has not effect!")
+            messages.add(format!("{} attacks {}, but it has no effect!", self.name(), target.name()),
+                         WHITE
+            );
         }
-        target.take_damage(damage);
+        target.take_damage(damage, messages);
     }
 }
 
@@ -155,7 +158,7 @@ pub fn move_by(id: usize, dx: i32, dy: i32, map: &game_map::Map, objects: &mut [
     objects[id].set_pos((x + dx, y + dy));
 }
 
-pub fn player_more_or_attack(dx: i32, dy: i32, map: &game_map::Map, objects: &mut [Object]) {
+pub fn player_more_or_attack(dx: i32, dy: i32, game: &mut Game, objects: &mut [Object]) {
     let x = objects[PLAYER].x + dx;
     let y = objects[PLAYER].y + dy;
 
@@ -166,10 +169,10 @@ pub fn player_more_or_attack(dx: i32, dy: i32, map: &game_map::Map, objects: &mu
     match target_id {
         Some(target_id) => {
             let (player, target) = mut_two(PLAYER, target_id, objects);
-            player.attack(target);
+            player.attack(target, &mut game.messages);
         }
         None => {
-            move_by(PLAYER, dx, dy, &map, objects);
+            move_by(PLAYER, dx, dy, &game.map, objects);
         }
     }
 }
@@ -188,7 +191,7 @@ fn move_towards(id: usize, target_x: i32, target_y: i32, map: &game_map::Map, ob
     move_by(id, dx, dy, map, objects);
 }
 
-pub fn ai_take_turn(monster_id: usize, tcod: &Tcod, game: &Game, objects: &mut [Object]) {
+pub fn ai_take_turn(monster_id: usize, tcod: &Tcod, game: &mut Game, objects: &mut [Object]) {
     let (monster_x, monster_y) = objects[monster_id].pos();
     if tcod.fov.is_in_fov(monster_x, monster_y) {
         if objects[monster_id].distance_to(&objects[PLAYER]) >= 2.0 {
@@ -198,7 +201,7 @@ pub fn ai_take_turn(monster_id: usize, tcod: &Tcod, game: &Game, objects: &mut [
         } else if objects[PLAYER].fighter.map_or(false, |f| f.get_hp() > 0) {
             // close enough, attack!
             let (player, monster) = mut_two(PLAYER, monster_id, objects);
-            monster.attack(player);
+            monster.attack(player, &mut game.messages);
         }
     }
 }

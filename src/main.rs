@@ -4,7 +4,6 @@ mod game_map;
 mod game_object;
 mod gui;
 
-use std::cmp::max;
 use crate::fov_map::{FOV_ALGO, FOV_LIGHT_WALL};
 use tcod::colors::*;
 use tcod::console::*;
@@ -12,7 +11,8 @@ use tcod::map::Map as FovMap;
 use controls::PlayerAction;
 use game_object::Object;
 use crate::game_object::object::ai_take_turn;
-use crate::gui::render_bar;
+use crate::gui::status_bar;
+use crate::gui::message_log;
 
 const SCREEN_WIDTH: i32 = 80;
 const SCREEN_HEIGHT: i32 = 50;
@@ -73,12 +73,13 @@ fn render_all(tcod: &mut Tcod, game: &mut game_map::Game, objects: &[Object], fo
     let hp = objects[PLAYER].fighter.map_or(0, |f| f.get_hp());
     let max_hp = objects[PLAYER].fighter.map_or(0, |f| f.get_max_hp());
 
-    println!("HP: {}/{}", hp, max_hp);
     // show player's stats
-    render_bar(
+    status_bar::render_bar(
         &mut tcod.panel,
         1, 1, BAR_WIDTH, "HP", hp, max_hp, LIGHT_RED, DARK_RED
     );
+
+    message_log::draw_game_messages(&game.messages, &mut tcod.panel);
 
     blit(
         &tcod.panel,
@@ -115,7 +116,13 @@ fn main() {
 
     let mut game = game_map::Game {
         map: game_map::make_map(&mut objects),
+        messages: message_log::Messages::new()
     };
+
+    game.messages.add(
+        "Welcome stranger! Prepare to perish in the Tombs of the Acient Kings.",
+        RED
+    );
 
     fov_map::populate_fov_map(&mut tcod.fov, &game.map);
 
@@ -127,7 +134,7 @@ fn main() {
         tcod.root.flush();
 
         previous_player_position = objects[PLAYER].pos();
-        let player_action = controls::handle_keys(&mut tcod, &mut objects, &game.map);
+        let player_action = controls::handle_keys(&mut tcod, &mut objects, &mut game);
 
         if player_action == PlayerAction::Exit {
             break;
@@ -136,7 +143,7 @@ fn main() {
         if objects[PLAYER].is_alive() && player_action == PlayerAction::TookTurn {
             for id in 0..objects.len() {
                 if objects[id].ai.is_some() {
-                    ai_take_turn(id, &tcod, &game, &mut objects);
+                    ai_take_turn(id, &tcod, &mut game, &mut objects);
                 }
             }
         }

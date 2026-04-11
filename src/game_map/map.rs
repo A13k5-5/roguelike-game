@@ -3,6 +3,7 @@ use super::tile::Tile;
 use crate::Tcod;
 use crate::game_object::Object;
 use std::cmp;
+use crate::gui::message_log;
 use tcod::{BackgroundFlag, Color, Console};
 
 // colours of the map
@@ -31,6 +32,7 @@ pub type Map = Vec<Vec<Tile>>;
 
 pub struct Game {
     pub map: Map,
+    pub messages: message_log::Messages,
 }
 
 impl Game {
