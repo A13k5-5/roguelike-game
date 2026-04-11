@@ -8,7 +8,6 @@ pub enum Item {
 }
 
 pub fn pick_item_up(object_id: usize, game: &mut Game, objects: &mut Vec<Object>) {
-    dbg!("Picking up");
     if game.inventory.len() >= 26 {
         game.messages.add(
             format!(

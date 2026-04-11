@@ -2,10 +2,11 @@ use super::room::Rect;
 use super::tile::Tile;
 use crate::game_object::Object;
 use std::cmp;
+use crate::{PANEL_HEIGHT, SCREEN_HEIGHT};
 
 // size of the map
 pub const MAP_WIDTH: i32 = 80;
-pub const MAP_HEIGHT: i32 = 50;
+pub const MAP_HEIGHT: i32 = SCREEN_HEIGHT - PANEL_HEIGHT;
 
 pub type Map = Vec<Vec<Tile>>;
 
