@@ -35,19 +35,29 @@ impl Object {
     pub fn new_player() -> Self {
         let mut player = Self::new(0, 0, '@', WHITE, "player", true);
         player.alive = true;
-        player.fighter = Some(components::Fighter::new(30, 30, 2, 5));
+        player.fighter = Some(components::Fighter::new(
+            30, 30, 2, 5
+        ));
         player
     }
 
     pub fn new_troll(x: i32, y: i32) -> Self {
         let mut troll = Object::new(x, y, 'T', colors::DESATURATED_GREEN, "troll", true);
         troll.alive = true;
+        troll.fighter = Some(components::Fighter::new(
+            16, 16, 1, 4
+        ));
+        troll.ai = Some(components::Ai::Basic);
         troll
     }
 
     pub fn new_orc(x: i32, y: i32) -> Self {
         let mut orc = Object::new(x, y, 'o', colors::DESATURATED_GREEN, "orc", true);
         orc.alive = true;
+        orc.fighter = Some(components::Fighter::new(
+            10, 10, 0, 3
+        ));
+        orc.ai = Some(components::Ai::Basic);
         orc
     }
 
