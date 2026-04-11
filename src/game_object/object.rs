@@ -1,5 +1,6 @@
 use crate::{game_map, PLAYER};
-use tcod::{BackgroundFlag, Color, Console};
+use tcod::{colors, BackgroundFlag, Color, Console};
+use tcod::colors::WHITE;
 use super::components;
 
 // any game object
@@ -11,7 +12,7 @@ pub struct Object {
     color: Color,
     name: String,
     blocks: bool,
-    pub alive: bool,
+    alive: bool,
     fighter: Option<components::Fighter>,
     ai: Option<components::Ai>
 }
@@ -29,6 +30,25 @@ impl Object {
             fighter: None,
             ai: None
         }
+    }
+
+    pub fn new_player() -> Self {
+        let mut player = Self::new(0, 0, '@', WHITE, "player", true);
+        player.alive = true;
+        player.fighter = Some(components::Fighter::new(30, 30, 2, 5));
+        player
+    }
+
+    pub fn new_troll(x: i32, y: i32) -> Self {
+        let mut troll = Object::new(x, y, 'T', colors::DESATURATED_GREEN, "troll", true);
+        troll.alive = true;
+        troll
+    }
+
+    pub fn new_orc(x: i32, y: i32) -> Self {
+        let mut orc = Object::new(x, y, 'o', colors::DESATURATED_GREEN, "orc", true);
+        orc.alive = true;
+        orc
     }
 
     // set the colour and then draw the char of this object at its position
@@ -52,6 +72,10 @@ impl Object {
 
     pub fn name(&self) -> &str {
         self.name.as_str()
+    }
+
+    pub fn is_alive(&self) -> bool {
+        self.alive
     }
 }
 

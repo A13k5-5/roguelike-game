@@ -71,8 +71,7 @@ fn main() {
     };
 
     // create object representing the player
-    let mut player = Object::new(0, 0, '@', WHITE, "player", true);
-    player.alive = true;
+    let player = Object::new_player();
 
     let mut objects = vec![player];
 

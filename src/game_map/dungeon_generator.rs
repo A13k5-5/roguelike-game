@@ -90,12 +90,10 @@ fn place_objects(room: &Rect, map: &game_map::Map, objects: &mut Vec<Object>) {
         }
 
         //80% change of generating an orc
-        let mut monster = match rand::random::<f32>() < 0.8 {
-            true => Object::new(x, y, 'o', colors::DESATURATED_GREEN, "orc", true),
-            false => Object::new(x, y, 'T', colors::DARKER_GREEN, "troll", true),
+        let monster = match rand::random::<f32>() < 0.8 {
+            true => Object::new_orc(x, y),
+            false => Object::new_troll(x, y),
         };
-
-        monster.alive = true;
 
         objects.push(monster);
     }

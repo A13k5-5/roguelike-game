@@ -7,7 +7,7 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut [Object], map: &game_map::Map)
     use tcod::input::*;
 
     let key = tcod.root.wait_for_keypress(true);
-    let player_alive = objects[PLAYER].alive;
+    let player_alive = objects[PLAYER].is_alive();
 
     match (key, key.text(), player_alive) {
         (
