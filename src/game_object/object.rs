@@ -1,7 +1,7 @@
 use crate::{game_map, Tcod, PLAYER};
 use tcod::{colors, Color};
 use tcod::colors::{VIOLET, WHITE};
-use crate::game_map::Game;
+use crate::game::Game;
 use crate::gui::message_log::Messages;
 use super::components;
 

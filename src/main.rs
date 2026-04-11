@@ -3,6 +3,7 @@ mod fov_map;
 mod game_map;
 mod game_object;
 mod gui;
+mod game;
 
 use tcod::colors::*;
 use tcod::console::*;
@@ -31,7 +32,7 @@ struct Tcod {
     fov: FovMap,
 }
 
-fn render_all(tcod: &mut Tcod, game: &game_map::Game, objects: &[Object]) {
+fn render_all(tcod: &mut Tcod, game: &game::Game, objects: &[Object]) {
     // draw all visible objects
     let mut to_draw: Vec<_> = objects.iter()
         .filter(|o| tcod.fov.is_in_fov(o.x, o.y))
@@ -103,7 +104,7 @@ fn main() {
 
     let mut objects = vec![player];
 
-    let mut game = game_map::Game {
+    let mut game = game::Game {
         map: game_map::make_map(&mut objects),
         messages: message_log::Messages::new()
     };

@@ -2,7 +2,7 @@ use super::actions::PlayerAction;
 use crate::game_object::Object;
 use crate::game_object::object;
 use crate::{PLAYER, Tcod};
-use crate::game_map::Game;
+use crate::game::Game;
 
 pub fn handle_keys(tcod: &mut Tcod, objects: &mut [Object], game: &mut Game) -> PlayerAction {
     use tcod::input::{Key, KeyCode};

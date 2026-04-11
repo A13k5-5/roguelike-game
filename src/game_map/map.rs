@@ -10,11 +10,6 @@ pub const MAP_HEIGHT: i32 = 50;
 
 pub type Map = Vec<Vec<Tile>>;
 
-pub struct Game {
-    pub map: Map,
-    pub messages: message_log::Messages,
-}
-
 pub fn is_blocked(map: &Map, x: i32, y: i32, objects: &[Object]) -> bool {
     if map[x as usize][y as usize].blocks() {
         return true;
