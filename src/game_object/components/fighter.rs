@@ -15,4 +15,8 @@ impl Fighter {
             power
         }
     }
+
+    pub fn get_hp(&self) -> i32 {
+        self.hp
+    }
 }

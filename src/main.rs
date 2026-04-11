@@ -9,6 +9,7 @@ use tcod::console::*;
 use tcod::map::Map as FovMap;
 use controls::PlayerAction;
 use game_object::Object;
+use crate::game_object::object::ai_take_turn;
 
 const SCREEN_WIDTH: i32 = 80;
 const SCREEN_HEIGHT: i32 = 50;
@@ -95,13 +96,12 @@ fn main() {
             break;
         }
 
-        // if objects[PLAYER].alive && player_action != PlayerAction::DidntTakeTurn {
-        //     for object in &objects {
-        //         // all objects but the player themself
-        //         if (object as *const _) != (&objects[PLAYER] as *const _) {
-        //             println!("The {} growls", object.name())
-        //         }
-        //     }
-        // }
+        if objects[PLAYER].is_alive() && player_action != PlayerAction::DidntTakeTurn {
+            for id in 0..objects.len() {
+                if objects[id].ai.is_some() {
+                    ai_take_turn(id, &tcod, &game, &mut objects);
+                }
+            }
+        }
     }
 }
