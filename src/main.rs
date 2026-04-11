@@ -2,7 +2,9 @@ mod controls;
 mod fov_map;
 mod game_map;
 mod game_object;
+mod gui;
 
+use std::cmp::max;
 use crate::fov_map::{FOV_ALGO, FOV_LIGHT_WALL};
 use tcod::colors::*;
 use tcod::console::*;
@@ -10,9 +12,15 @@ use tcod::map::Map as FovMap;
 use controls::PlayerAction;
 use game_object::Object;
 use crate::game_object::object::ai_take_turn;
+use crate::gui::render_bar;
 
 const SCREEN_WIDTH: i32 = 80;
 const SCREEN_HEIGHT: i32 = 50;
+
+const BAR_WIDTH: i32 = 20;
+const PANEL_HEIGHT: i32 = 7;
+const PANEL_Y: i32 = SCREEN_HEIGHT - PANEL_HEIGHT;
+
 const PLAYER: usize = 0;
 
 const LIMIT_FPS: i32 = 20;
@@ -20,6 +28,7 @@ const LIMIT_FPS: i32 = 20;
 struct Tcod {
     root: Root,
     con: Offscreen,
+    panel: Offscreen,
     fov: FovMap,
 }
 
@@ -49,19 +58,6 @@ fn render_all(tcod: &mut Tcod, game: &mut game_map::Game, objects: &[Object], fo
 
     game.draw_map(tcod);
 
-    // show player's stats
-    tcod.root.set_default_foreground(WHITE);
-    if let Some(fighter) = objects[PLAYER].fighter {
-        println!("HP: {}/{}", fighter.get_hp(), fighter.get_max_hp());
-        tcod.root.print_ex(
-            1,
-            SCREEN_HEIGHT - 2,
-            BackgroundFlag::None,
-            TextAlignment::Left,
-            format!("HP: {}/{} ", fighter.get_hp(), fighter.get_max_hp()),
-        );
-    }
-
     blit(
         &tcod.con,
         (0, 0),
@@ -70,6 +66,28 @@ fn render_all(tcod: &mut Tcod, game: &mut game_map::Game, objects: &[Object], fo
         (0, 0),
         1.0,
         1.0,
+    );
+
+    tcod.panel.set_default_background(BLACK);
+    tcod.panel.clear();
+    let hp = objects[PLAYER].fighter.map_or(0, |f| f.get_hp());
+    let max_hp = objects[PLAYER].fighter.map_or(0, |f| f.get_max_hp());
+
+    println!("HP: {}/{}", hp, max_hp);
+    // show player's stats
+    render_bar(
+        &mut tcod.panel,
+        1, 1, BAR_WIDTH, "HP", hp, max_hp, LIGHT_RED, DARK_RED
+    );
+
+    blit(
+        &tcod.panel,
+        (0, 0),
+        (SCREEN_WIDTH, PANEL_HEIGHT),
+        &mut tcod.root,
+        (0, PANEL_Y),
+        1.0,
+        1.0
     );
 }
 
@@ -86,6 +104,7 @@ fn main() {
     let mut tcod = Tcod {
         root,
         con: Offscreen::new(game_map::MAP_WIDTH, game_map::MAP_HEIGHT),
+        panel: Offscreen::new(SCREEN_WIDTH, PANEL_HEIGHT),
         fov: FovMap::new(game_map::MAP_WIDTH, game_map::MAP_HEIGHT),
     };
 
