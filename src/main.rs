@@ -35,8 +35,13 @@ fn render_all(tcod: &mut Tcod, game: &mut game_map::Game, objects: &[Object], fo
         );
     }
 
+    let mut to_draw: Vec<_> = objects.iter()
+        .filter(|o| tcod.fov.is_in_fov(o.x, o.y))
+        .collect();
+    // sort so that non-blocking objects come first
+    to_draw.sort_by(|o1, o2| { o1.blocks().cmp(&o2.blocks()) });
     // draw all visible objects from the list
-    for object in objects {
+    for object in &to_draw {
         if tcod.fov.is_in_fov(object.x, object.y) {
             object.draw(&mut tcod.con);
         }

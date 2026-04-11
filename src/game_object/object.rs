@@ -160,7 +160,8 @@ pub fn player_more_or_attack(dx: i32, dy: i32, map: &game_map::Map, objects: &mu
     let y = objects[PLAYER].y + dy;
 
     // try to find an attackable object
-    let target_id = objects.iter().position(|object| object.pos() == (x, y));
+    let target_id = objects.iter()
+        .position(|object| object.fighter.is_some() && object.pos() == (x, y));
 
     match target_id {
         Some(target_id) => {
