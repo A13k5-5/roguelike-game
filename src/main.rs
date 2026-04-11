@@ -44,6 +44,19 @@ fn render_all(tcod: &mut Tcod, game: &mut game_map::Game, objects: &[Object], fo
 
     game.draw_map(tcod);
 
+    // show player's stats
+    tcod.root.set_default_foreground(WHITE);
+    if let Some(fighter) = objects[PLAYER].fighter {
+        println!("HP: {}/{}", fighter.get_hp(), fighter.get_max_hp());
+        tcod.root.print_ex(
+            1,
+            SCREEN_HEIGHT - 2,
+            BackgroundFlag::None,
+            TextAlignment::Left,
+            format!("HP: {}/{} ", fighter.get_hp(), fighter.get_max_hp()),
+        );
+    }
+
     blit(
         &tcod.con,
         (0, 0),
@@ -96,7 +109,7 @@ fn main() {
             break;
         }
 
-        if objects[PLAYER].is_alive() && player_action != PlayerAction::DidntTakeTurn {
+        if objects[PLAYER].is_alive() && player_action == PlayerAction::TookTurn {
             for id in 0..objects.len() {
                 if objects[id].ai.is_some() {
                     ai_take_turn(id, &tcod, &game, &mut objects);

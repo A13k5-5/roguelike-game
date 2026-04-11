@@ -19,4 +19,22 @@ impl Fighter {
     pub fn get_hp(&self) -> i32 {
         self.hp
     }
+    
+    pub fn get_max_hp(&self) -> i32 {
+        self.max_hp
+    }
+    
+    pub fn take_damage(&mut self, damage: i32) {
+        if damage > 0 {
+            self.hp -= damage;
+        }
+    }
+    
+    pub fn get_power(&self) -> i32 {
+        self.power
+    }
+    
+    pub fn get_defense(&self) -> i32 {
+        self.defense
+    }
 }

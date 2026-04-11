@@ -94,6 +94,25 @@ impl Object {
         let dy = other.y - self.y;
         ((dx.pow(2) + dy.pow(2)) as f32).sqrt()
     }
+
+    pub fn take_damage(&mut self, damage: i32) {
+        if let Some(fighter) = self.fighter.as_mut() {
+            fighter.take_damage(damage);
+        }
+    }
+
+    pub fn attack(&mut self, target: &mut Object) {
+        let damage = self.fighter.map_or(0, |f| f.get_power()) - target.fighter.map_or(0, |f| f.get_defense());
+
+        print!("{} attacks {} ", self.name(), target.name());
+
+        target.take_damage(damage);
+        if damage > 0 {
+            println!("for {} hit points.", damage);
+        } else {
+            println!("but it has not effect!")
+        }
+    }
 }
 
 // move by the given amount
@@ -117,10 +136,8 @@ pub fn player_more_or_attack(dx: i32, dy: i32, map: &game_map::Map, objects: &mu
 
     match target_id {
         Some(target_id) => {
-            println!(
-                "The {} laughs at your puny efforts to attack him!",
-                objects[target_id].name()
-            )
+            let (player, target) = mut_two(PLAYER, target_id, objects);
+            player.attack(target);
         }
         None => {
             move_by(PLAYER, dx, dy, &map, objects);
@@ -128,7 +145,7 @@ pub fn player_more_or_attack(dx: i32, dy: i32, map: &game_map::Map, objects: &mu
     }
 }
 
-pub fn move_towards(id: usize, target_x: i32, target_y: i32, map: &game_map::Map, objects: &mut [Object]) {
+fn move_towards(id: usize, target_x: i32, target_y: i32, map: &game_map::Map, objects: &mut [Object]) {
     // vector from this object to the target distance
     let dx = target_x - objects[id].x;
     let dy = target_y - objects[id].y;
@@ -151,11 +168,14 @@ pub fn ai_take_turn(monster_id: usize, tcod: &Tcod, game: &Game, objects: &mut [
             move_towards(monster_id, player_x, player_y, &game.map, objects);
         } else if objects[PLAYER].fighter.map_or(false, |f| f.get_hp() > 0) {
             // close enough, attack!
-            let monster = &objects[monster_id];
-            println!(
-                "The attack of the {} bounces off your shiny metal armor!",
-                monster.name
-            )
+            let (player, monster) = mut_two(PLAYER, monster_id, objects);
+            monster.attack(player);
         }
     }
+}
+
+fn mut_two<T> (first_index: usize, second_index: usize, items: &mut [T]) -> (&mut T, &mut T) {
+    assert!(first_index < second_index);
+    let (first_slice, second_slice) = items.split_at_mut(second_index);
+    (&mut first_slice[first_index], &mut second_slice[0])
 }
