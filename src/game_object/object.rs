@@ -158,7 +158,7 @@ pub fn move_by(id: usize, dx: i32, dy: i32, map: &game_map::Map, objects: &mut [
     objects[id].set_pos((x + dx, y + dy));
 }
 
-pub fn player_more_or_attack(dx: i32, dy: i32, game: &mut Game, objects: &mut [Object]) {
+pub fn player_move_or_attack(dx: i32, dy: i32, game: &mut Game, objects: &mut [Object]) {
     let x = objects[PLAYER].x + dx;
     let y = objects[PLAYER].y + dy;
 

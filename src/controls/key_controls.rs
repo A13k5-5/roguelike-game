@@ -1,11 +1,11 @@
 use super::actions::PlayerAction;
 use crate::game_object::Object;
 use crate::game_object::object;
-use crate::{PLAYER, Tcod, game_map};
+use crate::{PLAYER, Tcod};
 use crate::game_map::Game;
 
 pub fn handle_keys(tcod: &mut Tcod, objects: &mut [Object], game: &mut Game) -> PlayerAction {
-    use tcod::input::*;
+    use tcod::input::{Key, KeyCode};
 
     let key = tcod.root.wait_for_keypress(true);
     let player_alive = objects[PLAYER].is_alive();
@@ -41,7 +41,7 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut [Object], game: &mut Game) -> 
             },
             _,
             true,
-        ) => object::player_more_or_attack(0, -1, game, objects),
+        ) => object::player_move_or_attack(0, -1, game, objects),
         (
             Key {
                 code: KeyCode::Down,
@@ -49,7 +49,7 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut [Object], game: &mut Game) -> 
             },
             _,
             true,
-        ) => object::player_more_or_attack(0, 1, game, objects),
+        ) => object::player_move_or_attack(0, 1, game, objects),
         (
             Key {
                 code: KeyCode::Left,
@@ -57,7 +57,7 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut [Object], game: &mut Game) -> 
             },
             _,
             true,
-        ) => object::player_more_or_attack(-1, 0, game, objects),
+        ) => object::player_move_or_attack(-1, 0, game, objects),
         (
             Key {
                 code: KeyCode::Right,
@@ -65,7 +65,7 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut [Object], game: &mut Game) -> 
             },
             _,
             true,
-        ) => object::player_more_or_attack(1, 0, game, objects),
+        ) => object::player_move_or_attack(1, 0, game, objects),
 
         _ => return PlayerAction::DidntTakeTurn,
     }

@@ -4,7 +4,6 @@ use super::tile::Tile;
 use crate::game_map::{MAP_HEIGHT, MAP_WIDTH};
 use crate::{Object, PLAYER, game_map};
 use rand::RngExt;
-use tcod::colors;
 
 // parameters for dungeon generator
 const ROOM_MAX_SIZE: i32 = 10;
