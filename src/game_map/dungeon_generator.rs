@@ -80,7 +80,7 @@ fn generate_rooms() -> Vec<Rect> {
 }
 
 fn place_objects_into_room(room: &Rect, map: &game_map::Map, objects: &mut Vec<Object>) {
-    // place_monsters(room, map, objects);
+    place_monsters(room, map, objects);
     place_items(room, map, objects);
 }
 
