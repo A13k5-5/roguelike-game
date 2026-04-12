@@ -1,7 +1,5 @@
-use crate::{game_map, Tcod, PLAYER};
 use tcod::{colors, Color};
 use tcod::colors::{VIOLET, WHITE};
-use crate::game::Game;
 use crate::gui::message_log::Messages;
 use crate::item::Item;
 use super::components;
@@ -158,68 +156,3 @@ impl Object {
     }
 }
 
-// move by the given amount
-pub fn move_by(id: usize, dx: i32, dy: i32, map: &game_map::Map, objects: &mut [Object]) {
-    let (x, y) = objects[id].pos();
-
-    // if blocked wall, not possible to get there
-    if game_map::is_blocked(map, x + dx, y + dy, objects) {
-        return;
-    }
-
-    objects[id].set_pos((x + dx, y + dy));
-}
-
-pub fn player_move_or_attack(dx: i32, dy: i32, game: &mut Game, objects: &mut [Object]) {
-    let x = objects[PLAYER].x + dx;
-    let y = objects[PLAYER].y + dy;
-
-    // try to find an attackable object
-    let target_id = objects.iter()
-        .position(|object| object.fighter.is_some() && object.pos() == (x, y));
-
-    match target_id {
-        Some(target_id) => {
-            let (player, target) = mut_two(PLAYER, target_id, objects);
-            player.attack(target, &mut game.messages);
-        }
-        None => {
-            move_by(PLAYER, dx, dy, &game.map, objects);
-        }
-    }
-}
-
-fn move_towards(id: usize, target_x: i32, target_y: i32, map: &game_map::Map, objects: &mut [Object]) {
-    // vector from this object to the target distance
-    let dx = target_x - objects[id].x;
-    let dy = target_y - objects[id].y;
-    let distance = ((dx.pow(2) + dy.pow(2)) as f32).sqrt();
-
-    // normalize to length 1, then round it and convert to integer, so movement is restricted to the map grid
-    let dx = (dx as f32 / distance).round() as i32;
-    let dy = (dy as f32 / distance).round() as i32;
-
-    // println!("The movement vector of {} is ({}, {})", objects[id].name, dx, dy);
-    move_by(id, dx, dy, map, objects);
-}
-
-pub fn ai_take_turn(monster_id: usize, tcod: &Tcod, game: &mut Game, objects: &mut [Object]) {
-    let (monster_x, monster_y) = objects[monster_id].pos();
-    if tcod.fov.is_in_fov(monster_x, monster_y) {
-        if objects[monster_id].distance_to(&objects[PLAYER]) >= 2.0 {
-            // move towards player if far away
-            let (player_x, player_y) = objects[PLAYER].pos();
-            move_towards(monster_id, player_x, player_y, &game.map, objects);
-        } else if objects[PLAYER].fighter.map_or(false, |f| f.get_hp() > 0) {
-            // close enough, attack!
-            let (player, monster) = mut_two(PLAYER, monster_id, objects);
-            monster.attack(player, &mut game.messages);
-        }
-    }
-}
-
-fn mut_two<T> (first_index: usize, second_index: usize, items: &mut [T]) -> (&mut T, &mut T) {
-    assert!(first_index < second_index);
-    let (first_slice, second_slice) = items.split_at_mut(second_index);
-    (&mut first_slice[first_index], &mut second_slice[0])
-}

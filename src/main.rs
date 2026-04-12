@@ -11,7 +11,6 @@ use tcod::console::*;
 use tcod::map::Map as FovMap;
 use controls::PlayerAction;
 use game_object::Object;
-use crate::game_object::object::ai_take_turn;
 use crate::gui::status_bar;
 use crate::gui::message_log;
 
@@ -141,7 +140,7 @@ fn main() {
         if objects[PLAYER].is_alive() && player_action == PlayerAction::TookTurn {
             for id in 0..objects.len() {
                 if objects[id].ai.is_some() {
-                    ai_take_turn(id, &tcod, &mut game, &mut objects);
+                    game_object::ai::ai_take_turn(id, &tcod, &mut game, &mut objects);
                 }
             }
         }

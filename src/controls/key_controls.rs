@@ -1,6 +1,6 @@
 use super::actions::PlayerAction;
 use crate::game_object::Object;
-use crate::game_object::object;
+use crate::game_object::player_movement;
 use crate::{PLAYER, Tcod};
 use crate::game::Game;
 use crate::gui::inventory;
@@ -43,7 +43,7 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut Vec<Object>, game: &mut Game) 
             },
             _,
             true,
-        ) => object::player_move_or_attack(0, -1, game, objects),
+        ) => player_movement::player_move_or_attack(0, -1, game, objects),
         (
             Key {
                 code: KeyCode::Down,
@@ -51,7 +51,7 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut Vec<Object>, game: &mut Game) 
             },
             _,
             true,
-        ) => object::player_move_or_attack(0, 1, game, objects),
+        ) => player_movement::player_move_or_attack(0, 1, game, objects),
         (
             Key {
                 code: KeyCode::Left,
@@ -59,7 +59,7 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut Vec<Object>, game: &mut Game) 
             },
             _,
             true,
-        ) => object::player_move_or_attack(-1, 0, game, objects),
+        ) => player_movement::player_move_or_attack(-1, 0, game, objects),
         (
             Key {
                 code: KeyCode::Right,
@@ -67,7 +67,7 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut Vec<Object>, game: &mut Game) 
             },
             _,
             true,
-        ) => object::player_move_or_attack(1, 0, game, objects),
+        ) => player_movement::player_move_or_attack(1, 0, game, objects),
 
         // pick item
         (Key { code: KeyCode::Char, .. }, 'g', true) => {
