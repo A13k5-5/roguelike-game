@@ -1,3 +1,4 @@
+use std::cmp;
 use super::death_callback::DeathCallback;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -26,6 +27,15 @@ impl Fighter {
 
     pub fn get_max_hp(&self) -> i32 {
         self.max_hp
+    }
+
+    pub fn has_full_hp(&self) -> bool {
+        self.get_hp() == self.get_max_hp()
+    }
+
+    pub fn heal(&mut self, heal_amount: i32) {
+        // make sure not to overflow with the hp
+        self.hp = cmp::min(self.get_max_hp(), self.hp + heal_amount);
     }
 
     pub fn take_damage(&mut self, damage: i32) {

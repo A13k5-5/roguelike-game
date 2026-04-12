@@ -1,7 +1,7 @@
 use tcod::{colors, Color};
 use tcod::colors::{VIOLET, WHITE};
 use crate::gui::message_log::Messages;
-use crate::item::Item;
+use crate::item::item::Item;
 use super::components;
 
 // any game object
@@ -153,6 +153,12 @@ impl Object {
             );
         }
         target.take_damage(damage, messages);
+    }
+
+    pub fn heal(&mut self, heal_amount: i32) {
+        if let Some(ref mut fighter) = self.fighter {
+            fighter.heal(heal_amount);
+        }
     }
 }
 

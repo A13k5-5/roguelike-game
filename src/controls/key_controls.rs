@@ -4,7 +4,7 @@ use crate::game_object::player_movement;
 use crate::{PLAYER, Tcod};
 use crate::game::Game;
 use crate::gui::inventory;
-use crate::item::pick_item_up;
+use crate::item::item;
 
 pub fn handle_keys(tcod: &mut Tcod, objects: &mut Vec<Object>, game: &mut Game) -> PlayerAction {
     use tcod::input::{Key, KeyCode};
@@ -74,18 +74,22 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut Vec<Object>, game: &mut Game) 
             let item_id = objects.iter()
                 .position(|object| object.item.is_some() && object.pos() == objects[PLAYER].pos());
             if let Some(item_id) = item_id {
-                pick_item_up(item_id, game, objects);
+                item::pick_item_up(item_id, game, objects);
             }
             return PlayerAction::DidntTakeTurn;
         },
 
         // inventory
-        (Key { code: KeyCode::Char, .. }, 'e', true) => {
-            inventory::inventory_menu(
+        (Key { code: KeyCode::Char, .. }, 'i', true) => {
+            // use users choice to use an item
+            let inventory_index = inventory::inventory_menu(
                 &game.inventory,
                 "Press the key next to an item to use it, or any other to cancel.\n",
                 &mut tcod.root
             );
+            if let Some(inventory_index) = inventory_index {
+                item::use_item(inventory_index, game, objects);
+            }
             return PlayerAction::DidntTakeTurn;
         }
 

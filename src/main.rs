@@ -4,7 +4,7 @@ mod game_map;
 mod game_object;
 mod gui;
 mod game;
-mod item;
+pub mod item;
 
 use tcod::colors::*;
 use tcod::console::*;
