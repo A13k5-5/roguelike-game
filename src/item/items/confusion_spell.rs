@@ -1,3 +1,4 @@
+use tcod::colors::RED;
 use crate::game::Game;
 use crate::game_object::components::Ai;
 use crate::game_object::Object;
@@ -20,6 +21,7 @@ pub fn cast_confusion(_inventory_id: usize, tcod: &Tcod, game: &mut Game, object
             UseResult::UsedUp
         },
         None => {
+            game.messages.add("No enemy is close enough.", RED);
             UseResult::Cancelled
         }
     }
