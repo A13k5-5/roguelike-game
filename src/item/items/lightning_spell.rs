@@ -2,7 +2,8 @@ use tcod::colors::{LIGHT_BLUE, RED};
 use crate::game::Game;
 use crate::game_object::Object;
 use crate::item::use_result::UseResult;
-use crate::{Tcod, PLAYER};
+use crate::Tcod;
+use super::utils::closest_monster;
 
 const LIGHTNING_DAMAGE: i32 = 40;
 const LIGHTNING_RANGE: i32 = 5;
@@ -29,19 +30,3 @@ pub fn cast_lightning(_inventory_id: usize, tcod: &Tcod, game: &mut Game, object
     }
 }
 
-fn closest_monster(objects: &[Object], max_range: i32, tcod: &Tcod) -> Option<usize> {
-    let mut closest_monster: Option<usize> = None;
-    let mut closest_dist = (max_range + 1) as f32;
-
-    for (id, object) in objects.iter().enumerate() {
-        if id != PLAYER && object.fighter.is_some() && object.ai.is_some() && tcod.fov.is_in_fov(object.x, object.y) {
-            let dist = objects[PLAYER].distance_to(object);
-            if dist < closest_dist {
-                closest_monster = Some(id);
-                closest_dist = dist;
-            }
-        }
-    }
-
-    closest_monster
-}

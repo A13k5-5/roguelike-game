@@ -107,7 +107,7 @@ fn main() {
     let mut game = game::Game {
         map: game_map::make_map(&mut objects),
         messages: message_log::Messages::new(),
-        inventory: vec![]
+        inventory: vec![Object::new_confusion_spell(0,0), Object::new_confusion_spell(0,0), Object::new_confusion_spell(0,0)]
     };
 
     game.messages.add(

@@ -1,5 +1,5 @@
 use tcod::{colors, Color};
-use tcod::colors::{LIGHT_YELLOW, VIOLET, WHITE};
+use tcod::colors::{LIGHT_BLUE, LIGHT_YELLOW, VIOLET, WHITE};
 use crate::gui::message_log::Messages;
 use crate::item::item::Item;
 use super::components;
@@ -76,6 +76,13 @@ impl Object {
         lightning_spell.item = Some(Item::LightningSpell);
 
         lightning_spell
+    }
+
+    pub fn new_confusion_spell(x: i32, y: i32) -> Self {
+        let mut confusion_spell = Object::new(x, y, '$', LIGHT_BLUE, "scroll of confusion", false);
+        confusion_spell.item = Some(Item::ConfusionSpell);
+
+        confusion_spell
     }
 
     pub fn set_pos(&mut self, point: (i32, i32)) {

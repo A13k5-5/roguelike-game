@@ -121,10 +121,11 @@ fn generate_monster(x: i32, y: i32) -> Object {
 
 fn generate_item(x: i32, y: i32) -> Object {
     let random_val = rand::random::<f32>();
-    if random_val < 0.5 {
+    if random_val < 0.3 {
         Object::new_healing_potion(x, y)
-    } else {
+    } else if random_val < 0.6 {
         Object::new_lighting_spell(x, y)
+    } else {
+        Object::new_confusion_spell(x, y)
     }
 }
-

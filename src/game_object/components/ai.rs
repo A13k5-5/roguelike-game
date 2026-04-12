@@ -1,4 +1,8 @@
 #[derive(Clone, Debug, PartialEq)]
 pub enum Ai {
-    Basic
+    Basic,
+    Confused {
+        previous_ai: Box<Ai>,
+        num_turns: i32
+    }
 }

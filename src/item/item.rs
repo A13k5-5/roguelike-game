@@ -8,7 +8,8 @@ use crate::Tcod;
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Item {
     Heal,
-    LightningSpell
+    LightningSpell,
+    ConfusionSpell
 }
 
 pub fn pick_item_up(object_id: usize, game: &mut Game, objects: &mut Vec<Object>) {
@@ -33,7 +34,8 @@ pub fn use_item(inventory_id: usize, tcod: &Tcod, game: &mut Game, objects: &mut
     if let Some(item) = game.inventory[inventory_id].item {
         let on_use = match item {
             Item::Heal => items::heal_potion::cast_heal,
-            Item::LightningSpell => items::lightning_spell::cast_lightning
+            Item::LightningSpell => items::lightning_spell::cast_lightning,
+            Item::ConfusionSpell => items::confusion_spell::cast_confusion
         };
 
         match on_use(inventory_id, tcod, game, objects) {
