@@ -25,7 +25,7 @@ const PLAYER: usize = 0;
 
 const LIMIT_FPS: i32 = 20;
 
-struct Tcod {
+pub struct Tcod {
     root: Root,
     con: Offscreen,
     panel: Offscreen,

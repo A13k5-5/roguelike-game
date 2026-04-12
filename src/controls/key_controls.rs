@@ -88,7 +88,7 @@ pub fn handle_keys(tcod: &mut Tcod, objects: &mut Vec<Object>, game: &mut Game) 
                 &mut tcod.root
             );
             if let Some(inventory_index) = inventory_index {
-                item::use_item(inventory_index, game, objects);
+                item::use_item(inventory_index, tcod, game, objects);
             }
             return PlayerAction::DidntTakeTurn;
         }
