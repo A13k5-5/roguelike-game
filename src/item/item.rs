@@ -1,10 +1,9 @@
-use tcod::colors::{GREEN, LIGHT_VIOLET, RED, WHITE};
+use tcod::colors::{GREEN, RED, WHITE};
 use crate::game::Game;
 use crate::game_object::Object;
+use crate::item::items;
 use crate::item::use_result::UseResult;
-use crate::PLAYER;
 
-const HEAL_AMOUNT: i32 = 4;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Item {
@@ -33,8 +32,8 @@ pub fn pick_item_up(object_id: usize, game: &mut Game, objects: &mut Vec<Object>
 pub fn use_item(inventory_id: usize, game: &mut Game, objects: &mut [Object]) {
     if let Some(item) = game.inventory[inventory_id].item {
         let on_use = match item {
-            Item::Heal => cast_heal,
-            Item::LightningSpell => cast_lightning
+            Item::Heal => items::heal_potion::cast_heal,
+            Item::LightningSpell => items::lightning_spell::cast_lightning
         };
 
         match on_use(inventory_id, game, objects) {
@@ -52,22 +51,4 @@ pub fn use_item(inventory_id: usize, game: &mut Game, objects: &mut [Object]) {
             WHITE
         );
     }
-}
-
-fn cast_heal(_inventory_id: usize, game: &mut Game, objects: &mut [Object]) -> UseResult {
-    // heal the player
-    if let Some(fighter) = objects[PLAYER].fighter {
-        if fighter.has_full_hp() {
-            game.messages.add("You are already at full health.", RED);
-            return UseResult::Cancelled;
-        }
-        game.messages.add("Your wounds start to feel better!", LIGHT_VIOLET);
-        objects[PLAYER].heal(HEAL_AMOUNT);
-        return UseResult::UsedUp;
-    }
-    UseResult::Cancelled
-}
-
-fn cast_lightning(_inventory_id: usize, game: &mut Game, objects: &mut [Object]) -> UseResult {
-    UseResult::Cancelled
 }
