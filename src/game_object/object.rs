@@ -1,5 +1,5 @@
 use tcod::{colors, Color};
-use tcod::colors::{VIOLET, WHITE};
+use tcod::colors::{LIGHT_YELLOW, VIOLET, WHITE};
 use crate::gui::message_log::Messages;
 use crate::item::item::Item;
 use super::components;
@@ -69,6 +69,13 @@ impl Object {
         healing_potion.item = Some(Item::Heal);
 
         healing_potion
+    }
+
+    pub fn new_lighting_spell(x: i32, y: i32) -> Self {
+        let mut lightning_spell = Object::new(x, y, '#', LIGHT_YELLOW, "scroll of lightning bolt", false);
+        lightning_spell.item = Some(Item::LightningSpell);
+
+        lightning_spell
     }
 
     pub fn set_pos(&mut self, point: (i32, i32)) {

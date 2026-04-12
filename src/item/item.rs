@@ -8,7 +8,8 @@ const HEAL_AMOUNT: i32 = 4;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Item {
-    Heal
+    Heal,
+    LightningSpell
 }
 
 pub fn pick_item_up(object_id: usize, game: &mut Game, objects: &mut Vec<Object>) {
@@ -32,7 +33,8 @@ pub fn pick_item_up(object_id: usize, game: &mut Game, objects: &mut Vec<Object>
 pub fn use_item(inventory_id: usize, game: &mut Game, objects: &mut [Object]) {
     if let Some(item) = game.inventory[inventory_id].item {
         let on_use = match item {
-            Item::Heal => cast_heal
+            Item::Heal => cast_heal,
+            Item::LightningSpell => cast_lightning
         };
 
         match on_use(inventory_id, game, objects) {
@@ -63,5 +65,9 @@ fn cast_heal(_inventory_id: usize, game: &mut Game, objects: &mut [Object]) -> U
         objects[PLAYER].heal(HEAL_AMOUNT);
         return UseResult::UsedUp;
     }
+    UseResult::Cancelled
+}
+
+fn cast_lightning(_inventory_id: usize, game: &mut Game, objects: &mut [Object]) -> UseResult {
     UseResult::Cancelled
 }
